@@ -1,0 +1,25 @@
+{
+    "name": "projectify-app",
+    "version": "1.0.0",
+    "description": "Project Management App",
+    "main": "index.js",
+    "scripts": {
+        "start:dev": "nodemon index.js",
+        "prisma:g": "npx prisma generate --schema=./src/prisma/schema.prisma",
+        "db:p": "npx prisma db push --schema=./src/prisma/schema.prisma"
+    },
+    "repository": {
+        "type": "git",
+        "url": "projectify-app"
+    },
+    "author": "Durdona",
+    "license": "ISC",
+    "dependencies": {
+        "@prisma/client": "^5.3.1",
+        "express": "^4.18.2"
+    },
+    "devDependencies": {
+        "prisma": "^5.3.1"
+    },
+    "type": "module"
+}
