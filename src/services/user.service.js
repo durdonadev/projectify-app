@@ -7,7 +7,7 @@ class UserService {
                 data: input
             });
         } catch (error) {
-            throw error;
+            throw new Error(error);
         }
     };
 }
