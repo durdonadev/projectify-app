@@ -4,7 +4,7 @@
     "description": "Project Management App",
     "main": "index.js",
     "scripts": {
-        "start:dev": "nodemon index.js",
+        "start:dev": "nodemon ./src/index.js",
         "prisma:g": "npx prisma generate --schema=./src/prisma/schema.prisma",
         "db:p": "npx prisma db push --schema=./src/prisma/schema.prisma"
     },
@@ -16,6 +16,8 @@
     "license": "ISC",
     "dependencies": {
         "@prisma/client": "^5.3.1",
+        "bcryptjs": "^2.4.3",
+        "crypto-js": "^4.1.1",
         "express": "^4.18.2"
     },
     "devDependencies": {
