@@ -19,6 +19,31 @@ class UserController {
             res.status(500).json({ message: error.message });
         }
     };
+
+    login = async (req, res) => {
+        const { body } = req;
+        const input = {
+            email: body.email,
+            password: body.password
+        };
+
+        try {
+            const user = await userService.login(input);
+            if (user) {
+                res.status(200).json({
+                    message: "Success"
+                });
+            }
+        } catch (error) {
+            let statusCode = 500;
+            if (error.message === "Invalid Credentials") {
+                statusCode = 401;
+            }
+            res.status(statusCode).json({
+                message: error.message
+            });
+        }
+    };
 }
 
 export const userController = new UserController();
