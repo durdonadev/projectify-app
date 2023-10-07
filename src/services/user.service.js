@@ -1,11 +1,11 @@
 import { prisma } from "../prisma/index.js";
-import { hashFunction, generateSalt } from "../utils/hash.js";
+// import { hashFunction, generateSalt } from "../utils/hash.js";
+import { hasher } from "../utils/hash.js";
 
 class UserService {
     signUp = async (input) => {
         try {
-            const salt = generateSalt();
-            const hashedPassword = hashFunction(input.password + salt);
+            const hashedPassword = await hasher.hash(input.password);
             // Check if the email already exists in the database
             const existingUser = await prisma.user.findUnique({
                 where: {
@@ -19,34 +19,12 @@ class UserService {
 
             // If the email is unique, create the new user
             await prisma.user.create({
-                data: { ...input, password: `${salt}.${hashedPassword}` }
+                data: { ...input, password: hashedPassword }
             });
         } catch (error) {
             throw error;
         }
     };
-
-    // login = async (input) => {
-    //     try {
-    //         const user = await prisma.user.findFirst({
-    //             where: {
-    //                 email: input.email
-    //             }
-    //         });
-
-    //         if (user) {
-    //             if (user.password !== input.password) {
-    //                 throw new Error("Invalid Credentials");
-    //             } else if (user.password === input.password) {
-    //                 return user;
-    //             }
-    //         } else {
-    //             throw new Error("Invalid Credentials");
-    //         }
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // };
 
     login = async (input) => {
         try {
@@ -56,17 +34,28 @@ class UserService {
                 }
             });
 
-            if (user) {
-                const [salt, userHashedPassword] = user.password.split(".");
-                const hashedPassword = hashFunction(input.password + salt);
-                if (userHashedPassword !== hashedPassword) {
-                    throw new Error("Invalid Credentials");
-                } else if (userHashedPassword === hashedPassword) {
-                    return user;
-                }
-            } else {
+            if (!user) {
                 throw new Error("Invalid Credentials");
             }
+
+            const isPasswordMatching = await hasher.compare(
+                input.password,
+                user.password
+            );
+            if (!isPasswordMatching) {
+                throw new Error("Invalid Credentials");
+            }
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    update = async (input, id) => {
+        try {
+            await prisma.user.update({
+                where: { id },
+                data: input
+            });
         } catch (error) {
             throw error;
         }
