@@ -9,7 +9,8 @@ class UserController {
             preferredFirstName: body.preferredFirstName,
             firstName: body.firstName,
             lastName: body.lastName,
-            password: body.password
+            password: body.password,
+            bio: body.bio
         };
 
         try {
@@ -28,12 +29,11 @@ class UserController {
         };
 
         try {
-            const user = await userService.login(input);
-            if (user) {
-                res.status(200).json({
-                    message: "Success"
-                });
-            }
+            await userService.login(input);
+
+            res.status(200).json({
+                message: "Success"
+            });
         } catch (error) {
             let statusCode = 500;
             if (error.message === "Invalid Credentials") {
