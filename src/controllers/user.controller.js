@@ -44,6 +44,27 @@ class UserController {
             });
         }
     };
+
+    update = async (req, res) => {
+        const allowedFields = ["firstName", "lastName", "bio"];
+        const { body, params } = req;
+
+        const input = {};
+        allowedFields.forEach((field) => {
+            if (body[field]) {
+                input[field] = body[field];
+            }
+        });
+
+        try {
+            await userService.update(input, params.id);
+            res.status(204).send();
+        } catch (error) {
+            res.status(500).json({
+                message: error
+            });
+        }
+    };
 }
 
 export const userController = new UserController();
