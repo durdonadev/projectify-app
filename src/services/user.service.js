@@ -1,28 +1,25 @@
 import { prisma } from "../prisma/index.js";
-// import { hashFunction, generateSalt } from "../utils/hash.js";
-import { hasher } from "../utils/hash.js";
+import { bcrypt } from "../utils/bcrypt.js";
+import { crypto } from "../utils/crypto.js";
+import { mailer } from "../utils/mailer.js";
 
 class UserService {
     signUp = async (input) => {
         try {
-            const hashedPassword = await hasher.hash(input.password);
-            // Check if the email already exists in the database
-            const existingUser = await prisma.user.findUnique({
-                where: {
-                    email: input.email
+            const hashedPassword = await bcrypt.hash(input.password);
+            const activationToken = crypto.createToken();
+            const hashedActivationToken = crypto.hash(activationToken);
+
+            await prisma.user.create({
+                data: {
+                    ...input,
+                    password: hashedPassword,
+                    activationToken: hashedActivationToken
                 }
             });
-
-            if (existingUser) {
-                throw new Error("Email already in use");
-            }
-
-            // If the email is unique, create the new user
-            await prisma.user.create({
-                data: { ...input, password: hashedPassword }
-            });
+            await mailer.sendActivationMail(input.email, activationToken);
         } catch (error) {
-            throw error;
+            throw new Error(error);
         }
     };
 
@@ -31,6 +28,11 @@ class UserService {
             const user = await prisma.user.findFirst({
                 where: {
                     email: input.email
+                },
+                select: {
+                    id: true,
+                    status: true,
+                    password: true
                 }
             });
 
@@ -38,14 +40,66 @@ class UserService {
                 throw new Error("Invalid Credentials");
             }
 
-            const isPasswordMatching = await hasher.compare(
+            if (user.status === "INACTIVE") {
+                const activationToken = crypto.createToken();
+                const hashedActivationToken = crypto.hash(activationToken);
+
+                await prisma.user.update({
+                    where: {
+                        id: user.id
+                    },
+                    data: {
+                        activationToken: hashedActivationToken
+                    }
+                });
+
+                await mailer.sendActivationMail(input.email, activationToken);
+
+                throw new Error(
+                    "We just sent you activation email. Follow instructions"
+                );
+            }
+
+            const isPasswordMatches = await bcrypt.compare(
                 input.password,
                 user.password
             );
-            if (!isPasswordMatching) {
+            if (!isPasswordMatches) {
                 throw new Error("Invalid Credentials");
             }
         } catch (error) {
+            throw error;
+        }
+    };
+
+    activate = async (token) => {
+        try {
+            const hashedActivationToken = crypto.hash(token);
+            const user = await prisma.user.findFirst({
+                where: {
+                    activationToken: hashedActivationToken
+                },
+                select: {
+                    id: true,
+                    activationToken: true
+                }
+            });
+
+            if (!user) {
+                throw new Error("Invalid Token");
+            }
+
+            await prisma.user.update({
+                where: {
+                    id: user.id
+                },
+                data: {
+                    status: "ACTIVE",
+                    activationToken: ""
+                }
+            });
+        } catch (error) {
+            console.log(error);
             throw error;
         }
     };
