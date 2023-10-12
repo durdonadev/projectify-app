@@ -2,6 +2,7 @@ import { prisma } from "../prisma/index.js";
 import { bcrypt } from "../utils/bcrypt.js";
 import { crypto } from "../utils/crypto.js";
 import { mailer } from "../utils/mailer.js";
+import { date } from "../utils/date.js";
 
 class UserService {
     signUp = async (input) => {
@@ -95,11 +96,90 @@ class UserService {
                 },
                 data: {
                     status: "ACTIVE",
-                    activationToken: ""
+                    activationToken: null
                 }
             });
         } catch (error) {
             console.log(error);
+            throw error;
+        }
+    };
+
+    forgotPassword = async (email) => {
+        try {
+            const user = await prisma.user.findFirst({
+                where: {
+                    email
+                },
+                select: {
+                    id: true
+                }
+            });
+
+            if (!user) {
+                throw new Error(
+                    "We could not find a user with the email you provided"
+                );
+            }
+
+            const passwordResetToken = crypto.createToken();
+            const hashedPasswordResetToken = crypto.hash(passwordResetToken);
+
+            await prisma.user.update({
+                where: {
+                    id: user.id
+                },
+                data: {
+                    passwordResetToken: hashedPasswordResetToken,
+                    passwordResetTokenExpirationDate: date.addMinutes(10)
+                }
+            });
+
+            await mailer.sendPasswordResetToken(email, passwordResetToken);
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    resetPassword = async (token, password) => {
+        try {
+            const hashedPasswordResetToken = crypto.hash(token);
+            const user = await prisma.user.findFirst({
+                where: {
+                    passwordResetToken: hashedPasswordResetToken
+                },
+                select: {
+                    id: true,
+                    passwordResetToken: true,
+                    passwordResetTokenExpirationDate: true
+                }
+            });
+
+            if (!user) {
+                throw new Error("Invalid Token");
+            }
+
+            const currentTime = new Date();
+            const tokenExpDate = new Date(
+                user.passwordResetTokenExpirationDate
+            );
+
+            if (tokenExpDate < currentTime) {
+                // Token Expired;
+                throw new Error("Reset Token Expired");
+            }
+
+            await prisma.user.update({
+                where: {
+                    id: user.id
+                },
+                data: {
+                    password: await bcrypt.hash(password),
+                    passwordResetToken: null,
+                    passwordResetTokenExpirationDate: null
+                }
+            });
+        } catch (error) {
             throw error;
         }
     };

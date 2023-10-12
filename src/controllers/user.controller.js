@@ -70,6 +70,65 @@ class UserController {
         }
     };
 
+    forgotPassword = async (req, res) => {
+        const {
+            body: { email }
+        } = req;
+
+        try {
+            await userService.forgotPassword(email);
+            res.status(200).json({
+                message: "Password reset email has been sent"
+            });
+        } catch (error) {
+            res.status(500).json({
+                message: error.message
+            });
+        }
+    };
+
+    resetPassword = async (req, res) => {
+        const {
+            body: { password, passwordConfirm },
+            headers
+        } = req;
+        if (!password || !passwordConfirm) {
+            res.status(400).json({
+                message: "Password and Password Confirm is required"
+            });
+            return;
+        }
+
+        if (password !== passwordConfirm) {
+            res.status(400).json({
+                message: "Password and Password Confirm does not match"
+            });
+            return;
+        }
+        if (!headers.authorization) {
+            res.status(400).json({
+                message: "Reset Token is missing"
+            });
+        }
+        const [bearer, token] = headers.authorization.split(" ");
+        if (bearer !== "Bearer" || !token) {
+            res.status(400).json({
+                message: "Invalid Token"
+            });
+        }
+
+        try {
+            await userService.resetPassword(token, password);
+            res.status(200).json({
+                message: "Password successfully updated"
+            });
+        } catch (error) {
+            res.status(500).json({
+                message: error.message
+            });
+        }
+    };
+
     update = async (req, res) => {
         const allowedFields = ["firstName", "lastName", "bio"];
         const { body, params } = req;

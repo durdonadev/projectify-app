@@ -13,14 +13,16 @@ enum AccountStatus {
 }
 
 model User {
-    id                 String        @id @default(auto()) @map("_id") @db.ObjectId
-    email              String        @unique
-    preferredFirstName String?
-    firstName          String
-    lastName           String
-    password           String
-    status             AccountStatus @default(INACTIVE)
-    activationToken    String?
-    createdAt          DateTime      @default(now())
-    updatedAt          DateTime      @updatedAt
+    id                               String        @id @default(auto()) @map("_id") @db.ObjectId
+    email                            String        @unique
+    preferredFirstName               String?
+    firstName                        String
+    lastName                         String
+    password                         String
+    status                           AccountStatus @default(INACTIVE)
+    activationToken                  String?
+    passwordResetToken               String?
+    passwordResetTokenExpirationDate DateTime?
+    createdAt                        DateTime      @default(now())
+    updatedAt                        DateTime      @updatedAt
 }
