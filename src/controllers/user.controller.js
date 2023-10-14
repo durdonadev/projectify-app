@@ -1,4 +1,5 @@
 import { userService } from "../services/user.service.js";
+import signature from "cookie-signature";
 
 class UserController {
     signUp = async (req, res) => {
@@ -28,11 +29,18 @@ class UserController {
         };
 
         try {
-            await userService.login(input);
+            const sessionId = await userService.login(input);
+            const signedSessionId =
+                "s:" + signature.sign(sessionId, process.env.COOKIE_SECRET);
+            console.log(signedSessionId);
+            console.log(sessionId);
 
-            res.status(200).json({
-                message: "Success"
+            res.cookie("sessionId", signedSessionId, {
+                maxAge: 10000,
+                httpOnly: true,
+                secure: true
             });
+            res.send();
         } catch (error) {
             let statusCode = 500;
             if (error.message === "Invalid Credentials") {
@@ -122,6 +130,34 @@ class UserController {
             res.status(200).json({
                 message: "Password successfully updated"
             });
+        } catch (error) {
+            res.status(500).json({
+                message: error.message
+            });
+        }
+    };
+
+    getMe = async (req, res) => {
+        const { sessionId } = req;
+        try {
+            const me = await userService.getMe(sessionId);
+
+            res.status(200).json({
+                data: me
+            });
+        } catch (error) {
+            res.status(500).json({
+                message: error.message
+            });
+        }
+    };
+
+    logout = async (req, res) => {
+        const { sessionId } = req;
+        try {
+            await userService.logout(sessionId);
+
+            res.status(204).send();
         } catch (error) {
             res.status(500).json({
                 message: error.message
