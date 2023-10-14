@@ -28,10 +28,10 @@ class UserController {
         };
 
         try {
-            await userService.login(input);
+            const sessionId = await userService.login(input);
 
             res.status(200).json({
-                message: "Success"
+                sessionId
             });
         } catch (error) {
             let statusCode = 500;
@@ -122,6 +122,58 @@ class UserController {
             res.status(200).json({
                 message: "Password successfully updated"
             });
+        } catch (error) {
+            res.status(500).json({
+                message: error.message
+            });
+        }
+    };
+
+    getMe = async (req, res) => {
+        const { headers } = req;
+        if (!headers.authorization) {
+            res.status(400).json({
+                message: "SessionId is missing"
+            });
+        }
+        const [bearer, sessionId] = headers.authorization.split(" ");
+        if (bearer !== "Bearer" || !sessionId) {
+            res.status(400).json({
+                message: "Invalid SessionId"
+            });
+        }
+
+        try {
+            const me = await userService.getMe(sessionId);
+
+            res.status(200).json({
+                data: me
+            });
+        } catch (error) {
+            res.status(500).json({
+                message: error.message
+            });
+        }
+    };
+
+    logout = async (req, res) => {
+        const { headers } = req;
+        if (!headers.authorization) {
+            res.status(400).json({
+                message: "SessionId is missing"
+            });
+        }
+        const [bearer, sessionId] = headers.authorization.split(" ");
+        if (bearer !== "Bearer" || !sessionId) {
+            res.status(400).json({
+                message: "Invalid SessionId"
+            });
+        }
+
+        try {
+            await userService.logout(sessionId);
+
+            res.status(204).send();
         } catch (error) {
             res.status(500).json({
                 message: error.message
