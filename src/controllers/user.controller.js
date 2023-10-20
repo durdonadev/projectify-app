@@ -258,6 +258,43 @@ class UserController {
             });
         }
     };
+
+    updateTask = async (req, res) => {
+        const { userId, params, body } = req;
+
+        const input = {};
+        if (body.status) {
+            input.status = body.status;
+        }
+        if (body.title) {
+            input.title = body.title;
+        }
+        if (body.description) {
+            input.description = body.description;
+        }
+
+        if (!Object.keys(input).length) {
+            res.status(400).json({
+                message: "Update data not provided"
+            });
+
+            return;
+        }
+
+        try {
+            await userService.updateTask(userId, params.taskId, input);
+            res.status(204).send();
+        } catch (error) {
+            let status = 500;
+            if (error.message === "Task not found") {
+                status = 404;
+            }
+
+            res.status(status).json({
+                message: error.message
+            });
+        }
+    };
 }
 
 export const userController = new UserController();
