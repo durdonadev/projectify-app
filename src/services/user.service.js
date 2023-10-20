@@ -272,6 +272,28 @@ class UserService {
             throw error;
         }
     };
+
+    getTask = async (userId, taskId) => {
+        try {
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: userId
+                },
+                select: {
+                    tasks: true
+                }
+            });
+
+            const task = user.tasks.find((task) => task.id === taskId);
+            if (!task) {
+                throw new Error("Task not found");
+            }
+
+            return task;
+        } catch (error) {
+            throw error;
+        }
+    };
 }
 
 export const userService = new UserService();
