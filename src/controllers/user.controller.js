@@ -226,11 +226,28 @@ class UserController {
     getTask = async (req, res) => {
         const { userId, params } = req;
         try {
-            const task = await userService.getTasks(userId, params.taskId);
+            const task = await userService.getTask(userId, params.taskId);
 
             res.status(200).json({
                 data: task
             });
+        } catch (error) {
+            let status = 500;
+            if (error.message === "Task not found") {
+                status = 404;
+            }
+            res.status(status).json({
+                message: error.message
+            });
+        }
+    };
+
+    deleteTask = async (req, res) => {
+        const { userId, params } = req;
+        try {
+            await userService.deleteTask(userId, params.taskId);
+
+            res.status(204).send();
         } catch (error) {
             let status = 500;
             if (error.message === "Task not found") {

@@ -258,7 +258,7 @@ class UserService {
 
     getTasks = async (userId) => {
         try {
-            const user = await prisma.user.findUnique({
+            const tasks = await prisma.user.findUnique({
                 where: {
                     id: userId
                 },
@@ -290,6 +290,36 @@ class UserService {
             }
 
             return task;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    deleteTask = async (userId, taskId) => {
+        try {
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: userId
+                },
+                select: {
+                    tasks: true
+                }
+            });
+
+            const tasksToKeep = user.tasks.filter((task) => task.id !== taskId);
+            if (tasksToKeep.length === user.tasks.length) {
+                throw new Error("Task not found");
+            }
+
+            await prisma.user.update({
+                where: {
+                    id: userId
+                },
+
+                data: {
+                    tasks: tasksToKeep
+                }
+            });
         } catch (error) {
             throw error;
         }
