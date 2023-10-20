@@ -5,6 +5,13 @@ class DateUtil {
 
         return new Date(unixDate);
     }
+
+    addHours(hours, date) {
+        const startDate = date || new Date();
+        const unixDate = startDate.setHours(startDate.getHours() + hours);
+
+        return new Date(unixDate);
+    }
 }
 
 export const date = new DateUtil();

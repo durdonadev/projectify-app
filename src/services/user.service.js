@@ -4,6 +4,7 @@ import { crypto } from "../utils/crypto.js";
 import { mailer } from "../utils/mailer.js";
 import { date } from "../utils/date.js";
 import jwt from "jsonwebtoken";
+import { v4 as uuid } from "uuid";
 
 class UserService {
     signUp = async (input) => {
@@ -11,7 +12,6 @@ class UserService {
             const hashedPassword = await bcrypt.hash(input.password);
             const activationToken = crypto.createToken();
             const hashedActivationToken = crypto.hash(activationToken);
-
             await prisma.user.create({
                 data: {
                     ...input,
@@ -21,7 +21,7 @@ class UserService {
             });
             await mailer.sendActivationMail(input.email, activationToken);
         } catch (error) {
-            throw new Error(error);
+            throw error;
         }
     };
 
@@ -38,9 +38,7 @@ class UserService {
                 }
             });
 
-            if (!user) {
-                throw new Error("Invalid Credentials");
-            }
+            if (!user) throw new Error("Invalid Credentials");
 
             if (user.status === "INACTIVE") {
                 const activationToken = crypto.createToken();
@@ -79,7 +77,7 @@ class UserService {
                     expiresIn: "2 days"
                 }
             );
-            console.log(token);
+
             return token;
         } catch (error) {
             throw error;
@@ -226,6 +224,147 @@ class UserService {
             await prisma.user.update({
                 where: { id },
                 data: input
+            });
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    createTask = async (userId, input) => {
+        const id = uuid();
+        const task = {
+            ...input,
+            status: "TODO",
+            id
+        };
+
+        try {
+            await prisma.user.update({
+                where: {
+                    id: userId
+                },
+                data: {
+                    tasks: {
+                        push: task
+                    }
+                }
+            });
+
+            return task;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    getTasks = async (userId) => {
+        try {
+            const tasks = await prisma.user.findUnique({
+                where: {
+                    id: userId
+                },
+                select: {
+                    tasks: true
+                }
+            });
+
+            return tasks;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    getTask = async (userId, taskId) => {
+        try {
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: userId
+                },
+                select: {
+                    tasks: true
+                }
+            });
+
+            const task = user.tasks.find((task) => task.id === taskId);
+            if (!task) {
+                throw new Error("Task not found");
+            }
+
+            return task;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    deleteTask = async (userId, taskId) => {
+        try {
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: userId
+                },
+                select: {
+                    tasks: true
+                }
+            });
+
+            const tasksToKeep = user.tasks.filter((task) => task.id !== taskId);
+            if (tasksToKeep.length === user.tasks.length) {
+                throw new Error("Task not found");
+            }
+
+            await prisma.user.update({
+                where: {
+                    id: userId
+                },
+
+                data: {
+                    tasks: tasksToKeep
+                }
+            });
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    updateTask = async (userId, taskId, input) => {
+        try {
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: userId
+                },
+
+                select: {
+                    tasks: true
+                }
+            });
+
+            const tasksNotToUpdate = [];
+            let taskToUpdate = null;
+
+            user.tasks.forEach((task) => {
+                if (task.id === taskId) {
+                    taskToUpdate = task;
+                } else {
+                    tasksNotToUpdate.push(task);
+                }
+            });
+
+            if (!taskToUpdate) {
+                throw new Error("Task not found");
+            }
+
+            const updatedTask = {
+                ...taskToUpdate,
+                ...input
+            };
+
+            await prisma.user.update({
+                where: {
+                    id: userId
+                },
+
+                data: {
+                    tasks: [...tasksNotToUpdate, updatedTask]
+                }
             });
         } catch (error) {
             throw error;
