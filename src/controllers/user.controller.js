@@ -177,6 +177,51 @@ class UserController {
             });
         }
     };
+
+    createTask = async (req, res) => {
+        const { userId, body } = req;
+
+        const input = {
+            title: body.title,
+            description: body.description,
+            due: body.due
+        };
+
+        if (!input.title || !input.due) {
+            res.status(400).json({
+                message: "Title or Due date cannot be empty"
+            });
+
+            return;
+        }
+
+        try {
+            const data = await userService.createTask(userId, input);
+
+            res.status(201).json({
+                data
+            });
+        } catch (error) {
+            res.status(500).json({
+                message: error.message
+            });
+        }
+    };
+
+    getTasks = async (req, res) => {
+        const { userId } = req;
+        try {
+            const tasks = await userService.getTasks(userId);
+
+            res.status(200).json({
+                data: tasks
+            });
+        } catch (error) {
+            res.status(500).json({
+                message: error.message
+            });
+        }
+    };
 }
 
 export const userController = new UserController();

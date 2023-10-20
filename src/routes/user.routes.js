@@ -16,5 +16,16 @@ userRouter.delete(
     userMiddleware.authenticate,
     userController.logout
 );
+userRouter.patch(
+    "/me/tasks",
+    userMiddleware.authenticate,
+    userController.createTask
+);
+
+userRouter.get(
+    "/me/tasks",
+    userMiddleware.authenticate,
+    userController.getTasks
+);
 
 export { userRouter };
