@@ -2,10 +2,11 @@ import { Router } from "express";
 import { userController } from "../controllers/user.controller.js";
 import { CookieMiddleware } from "../middlewares/cookie.middleware.js";
 import { userMiddleware } from "../middlewares/user.middleware.js";
+import { GlobalError } from "../middlewares/global-error.middleware.js";
 
 const userRouter = Router();
 
-userRouter.post("/sign-up", userController.signUp);
+userRouter.post("/sign-up", userController.signUp, GlobalError.handle);
 userRouter.post("/login", userController.login);
 userRouter.get("/activate", userController.activate);
 userRouter.patch("/forgot-password", userController.forgotPassword);
