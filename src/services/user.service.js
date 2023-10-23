@@ -5,83 +5,77 @@ import { mailer } from "../utils/mailer.js";
 import { date } from "../utils/date.js";
 import jwt from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
+import { CustomError } from "../middlewares/custom-error.middleware.js";
 
 class UserService {
     signUp = async (input) => {
-        try {
-            const hashedPassword = await bcrypt.hash(input.password);
-            const activationToken = crypto.createToken();
-            const hashedActivationToken = crypto.hash(activationToken);
-            await prisma.user.create({
-                data: {
-                    ...input,
-                    password: hashedPassword,
-                    activationToken: hashedActivationToken
-                }
-            });
-            await mailer.sendActivationMail(input.email, activationToken);
-        } catch (error) {
-            throw error;
-        }
+        const hashedPassword = await bcrypt.hash(input.password);
+        const activationToken = crypto.createToken();
+        const hashedActivationToken = crypto.hash(activationToken);
+        await prisma.user.create({
+            data: {
+                ...input,
+                password: hashedPassword,
+                activationToken: hashedActivationToken
+            }
+        });
+        await mailer.sendActivationMail(input.email, activationToken);
     };
 
     login = async (input) => {
-        try {
-            const user = await prisma.user.findFirst({
+        const user = await prisma.user.findFirst({
+            where: {
+                email: input.email
+            },
+            select: {
+                id: true,
+                status: true,
+                password: true
+            }
+        });
+
+        if (!user) throw new CustomError("User does not exist", 404);
+
+        if (user.status === "INACTIVE") {
+            const activationToken = crypto.createToken();
+            const hashedActivationToken = crypto.hash(activationToken);
+
+            await prisma.user.update({
                 where: {
-                    email: input.email
+                    id: user.id
                 },
-                select: {
-                    id: true,
-                    status: true,
-                    password: true
+                data: {
+                    activationToken: hashedActivationToken
                 }
             });
 
-            if (!user) throw new Error("Invalid Credentials");
+            await mailer.sendActivationMail(input.email, activationToken);
 
-            if (user.status === "INACTIVE") {
-                const activationToken = crypto.createToken();
-                const hashedActivationToken = crypto.hash(activationToken);
-
-                await prisma.user.update({
-                    where: {
-                        id: user.id
-                    },
-                    data: {
-                        activationToken: hashedActivationToken
-                    }
-                });
-
-                await mailer.sendActivationMail(input.email, activationToken);
-
-                throw new Error(
-                    "We just sent you activation email. Follow instructions"
-                );
-            }
-
-            const isPasswordMatches = await bcrypt.compare(
-                input.password,
-                user.password
+            throw new CustomError(
+                "We just sent you activation email. Follow instructions",
+                400
             );
-            if (!isPasswordMatches) {
-                throw new Error("Invalid Credentials");
-            }
-
-            const token = jwt.sign(
-                {
-                    userId: user.id
-                },
-                process.env.JWT_SECRET,
-                {
-                    expiresIn: "2 days"
-                }
-            );
-
-            return token;
-        } catch (error) {
-            throw error;
         }
+
+        const isPasswordMatches = await bcrypt.compare(
+            input.password,
+            user.password
+        );
+        if (!isPasswordMatches) {
+            throw new CustomError("Invalid Credentials", 401);
+        }
+
+        const token = jwt.sign(
+            {
+                userId: user.id
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "2 days"
+            }
+        );
+
+        return token;
     };
 
     activate = async (token) => {

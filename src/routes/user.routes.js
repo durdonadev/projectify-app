@@ -6,7 +6,7 @@ import { GlobalError } from "../middlewares/global-error.middleware.js";
 
 const userRouter = Router();
 
-userRouter.post("/sign-up", userController.signUp, GlobalError.handle);
+userRouter.post("/sign-up", userController.signUp);
 userRouter.post("/login", userController.login);
 userRouter.get("/activate", userController.activate);
 userRouter.patch("/forgot-password", userController.forgotPassword);
