@@ -243,7 +243,7 @@ class UserService {
 
             const task = user.tasks.find((task) => task.id === taskId);
             if (!task) {
-                throw new Error("Task not found");
+                throw new CustomError("Task not found", 404);
             }
 
             return task;
