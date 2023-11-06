@@ -12,6 +12,11 @@ enum AccountStatus {
     INACTIVE
 }
 
+enum ProjectStatus {
+    ACTIVE
+    ARCHIVED
+}
+
 enum TaskStatus {
     TODO
     INPROGRESS
@@ -24,6 +29,14 @@ type Tasks {
     description String?
     due         DateTime
     status      TaskStatus
+}
+
+model Company {
+    id       String @id @default(auto()) @map("_id") @db.ObjectId
+    name     String
+    position String
+
+    userId String @unique @db.ObjectId
 }
 
 model User {
@@ -40,4 +53,12 @@ model User {
     createdAt                        DateTime      @default(now())
     updatedAt                        DateTime      @updatedAt
     tasks                            Tasks[]
+}
+
+model Project {
+    id          String        @id @default(auto()) @map("_id") @db.ObjectId
+    name        String
+    description String
+    status      ProjectStatus @default(ACTIVE)
+    userId      String        @db.ObjectId
 }
