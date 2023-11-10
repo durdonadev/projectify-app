@@ -61,4 +61,19 @@ model Project {
     description String
     status      ProjectStatus @default(ACTIVE)
     userId      String        @db.ObjectId
+    createdAt   DateTime      @default(now())
+    updatedAt   DateTime      @updatedAt
+}
+
+model TeamMember {
+    id          String        @id @default(auto()) @map("_id") @db.ObjectId
+    firstName   String
+    lastName    String
+    email       String        @unique
+    password    String?
+    status      AccountStatus @default(INACTIVE)
+    userId      String        @db.ObjectId
+    inviteToken String?       @unique
+    createdAt   DateTime      @default(now())
+    updatedAt   DateTime      @updatedAt
 }
