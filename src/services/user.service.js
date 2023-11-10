@@ -101,7 +101,10 @@ class UserService {
         });
 
         if (!user) {
-            throw new CustomError("Invalid Token", 401);
+            throw new CustomError(
+                "User does not exist with with provided Activation Token",
+                404
+            );
         }
 
         await prisma.user.update({
@@ -127,7 +130,7 @@ class UserService {
 
         if (!user) {
             throw new CustomError(
-                "We could not find a user with the email you provided",
+                "User does not exist with provided email",
                 404
             );
         }
@@ -162,7 +165,10 @@ class UserService {
         });
 
         if (!user) {
-            throw new CustomError("Invalid Token", 400);
+            throw new CustomError(
+                "User does not exist with  provided Password Reset Token",
+                404
+            );
         }
 
         const currentTime = new Date();
@@ -170,7 +176,10 @@ class UserService {
 
         if (tokenExpDate < currentTime) {
             // Token Expired;
-            throw new CustomError("Reset Token Expired", 410);
+            throw new CustomError(
+                "Password Reset Token Expired: Request a new one",
+                400
+            );
         }
 
         await prisma.user.update({
@@ -200,7 +209,7 @@ class UserService {
         });
 
         if (!user) {
-            throw new CustomError("User not found", 404);
+            throw new Error("User does not exist anymore, 404");
         }
 
         const company = await prisma.company.findFirst({
@@ -241,6 +250,7 @@ class UserService {
             where: {
                 id: userId
             },
+
             select: {
                 tasks: true
             }
@@ -250,25 +260,22 @@ class UserService {
     };
 
     getTask = async (userId, taskId) => {
-        try {
-            const user = await prisma.user.findUnique({
-                where: {
-                    id: userId
-                },
-                select: {
-                    tasks: true
-                }
-            });
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId
+            },
 
-            const task = user.tasks.find((task) => task.id === taskId);
-            if (!task) {
-                throw new CustomError("Task not found", 404);
+            select: {
+                tasks: true
             }
+        });
 
-            return task;
-        } catch (error) {
-            throw error;
+        const task = user.tasks.find((task) => task.id === taskId);
+        if (!task) {
+            throw new CustomError("Task not found", 404);
         }
+
+        return task;
     };
 
     deleteTask = async (userId, taskId) => {
@@ -276,14 +283,16 @@ class UserService {
             where: {
                 id: userId
             },
+
             select: {
                 tasks: true
             }
         });
 
         const tasksToKeep = user.tasks.filter((task) => task.id !== taskId);
+
         if (tasksToKeep.length === user.tasks.length) {
-            throw new CustomError("Task not found", 404);
+            throw new CustomError("Task does not exist", 404);
         }
 
         await prisma.user.update({
@@ -320,7 +329,7 @@ class UserService {
         });
 
         if (!taskToUpdate) {
-            throw new CustomError("Task not found", 404);
+            throw new CustomError("Task does not exist", 404);
         }
 
         const updatedTask = {
