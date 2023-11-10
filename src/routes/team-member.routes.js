@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { userMiddleware } from "../middlewares/user.middleware.js";
+import { adminMiddleware } from "../middlewares/admin.middleware.js";
 import { teamMemberController } from "../controllers/team-member.controller.js";
 
 const teamMemberRouter = new Router();
 
 teamMemberRouter.post(
     "/",
-    userMiddleware.authenticate,
+    adminMiddleware.authenticate,
     teamMemberController.create
 );
 
