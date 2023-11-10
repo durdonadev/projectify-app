@@ -21,7 +21,7 @@ class UserMiddleware {
         try {
             const payload = jwt.verify(token, process.env.JWT_SECRET);
 
-            req.userId = payload.userId;
+            req.adminId = payload.adminId;
             next();
         } catch (error) {
             res.status(500).json({
@@ -31,4 +31,4 @@ class UserMiddleware {
     };
 }
 
-export const userMiddleware = new UserMiddleware();
+export const adminMiddleware = new UserMiddleware();

@@ -1,31 +1,31 @@
 import { Router } from "express";
-import { userMiddleware } from "../middlewares/user.middleware.js";
+import { adminMiddleware } from "../middlewares/admin.middleware.js";
 import { projectController } from "../controllers/project.controller.js";
 
 const projectRouter = Router();
 
-projectRouter.post("/", userMiddleware.authenticate, projectController.create);
+projectRouter.post("/", adminMiddleware.authenticate, projectController.create);
 projectRouter.get(
     "/:id",
-    userMiddleware.authenticate,
+    adminMiddleware.authenticate,
     projectController.getOne
 );
 
 projectRouter.patch(
     "/:id",
-    userMiddleware.authenticate,
+    adminMiddleware.authenticate,
     projectController.update
 );
-projectRouter.get("/", userMiddleware.authenticate, projectController.getAll);
+projectRouter.get("/", adminMiddleware.authenticate, projectController.getAll);
 
 projectRouter.patch(
     "/:id/archive",
-    userMiddleware.authenticate,
+    adminMiddleware.authenticate,
     projectController.archive
 );
 projectRouter.patch(
     "/:id/reactivate",
-    userMiddleware.authenticate,
+    adminMiddleware.authenticate,
     projectController.reactivate
 );
 

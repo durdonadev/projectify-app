@@ -4,7 +4,7 @@ import { projectService } from "../services/project.service.js";
 
 class ProjectController {
     create = catchAsync(async (req, res) => {
-        const { body, userId } = req;
+        const { body, adminId } = req;
         const input = {
             name: body.name,
             description: body.description
@@ -14,7 +14,7 @@ class ProjectController {
             throw new CustomError("Name and Description are required", 400);
         }
 
-        const project = await projectService.create(input, userId);
+        const project = await projectService.create(input, adminId);
 
         res.status(201).json({
             data: project
@@ -22,9 +22,9 @@ class ProjectController {
     });
 
     getOne = catchAsync(async (req, res) => {
-        const { userId, params } = req;
+        const { adminId, params } = req;
 
-        const project = await projectService.getOne(params.id, userId);
+        const project = await projectService.getOne(params.id, adminId);
 
         res.status(200).json({
             data: project
@@ -32,7 +32,7 @@ class ProjectController {
     });
 
     update = catchAsync(async (req, res) => {
-        const { body, params, userId } = req;
+        const { body, params, adminId } = req;
         const update = {};
 
         if (body.name) {
@@ -46,30 +46,30 @@ class ProjectController {
             throw new CustomError("No update data provided", 400);
         }
 
-        await projectService.update(params.id, userId, update);
+        await projectService.update(params.id, adminId, update);
         res.status(204).send();
     });
 
     getAll = catchAsync(async (req, res) => {
-        const { userId } = req;
+        const { adminId } = req;
 
-        const projects = await projectService.getAll(userId);
+        const projects = await projectService.getAll(adminId);
         res.status(200).json({
             data: projects
         });
     });
 
     archive = catchAsync(async (req, res) => {
-        const { params, userId } = req;
+        const { params, adminId } = req;
 
-        await projectService.changeStatus(params.id, userId, "ARCHIVED");
+        await projectService.changeStatus(params.id, adminId, "ARCHIVED");
         res.status(204).send();
     });
 
     reactivate = catchAsync(async (req, res) => {
-        const { params, userId } = req;
+        const { params, adminId } = req;
 
-        await projectService.changeStatus(params.id, userId, "ACTIVE");
+        await projectService.changeStatus(params.id, adminId, "ACTIVE");
         res.status(204).send();
     });
 }
