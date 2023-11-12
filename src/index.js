@@ -12,7 +12,7 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 4000;
 
-app.use("/admin", adminRouter);
+app.use("/admins", adminRouter);
 app.use("/projects", projectRouter);
 app.use("/team-members", teamMemberRouter);
 app.use(GlobalError.handle);
