@@ -73,7 +73,7 @@ model TeamMember {
     password    String?
     status      AccountStatus @default(INACTIVE)
     adminId     String        @db.ObjectId
-    inviteToken String?       @unique
+    inviteToken String?
     createdAt   DateTime      @default(now())
     updatedAt   DateTime      @updatedAt
 }
