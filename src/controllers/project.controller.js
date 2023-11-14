@@ -72,6 +72,67 @@ class ProjectController {
         await projectService.changeStatus(params.id, adminId, "ACTIVE");
         res.status(204).send();
     });
+
+    addContributor = catchAsync(async (req, res) => {
+        const { adminId, body } = req;
+
+        if (!body.teamMemberId || !body.projectId) {
+            throw new CustomError(
+                "All fields are required: teamMemberId, projectId",
+                400
+            );
+        }
+
+        await projectService.addContributor(
+            body.projectId,
+            body.teamMemberId,
+            adminId
+        );
+
+        res.status(200).json({
+            message: `Team member with ${body.teamMemberId} id was added to project with ${body.projectId} id`
+        });
+    });
+
+    deactivateContributor = catchAsync(async (req, res) => {
+        const { adminId, body } = req;
+
+        if (!body.teamMemberId || !body.projectId) {
+            throw new CustomError(
+                "All fields are required: teamMemberId, projectId",
+                400
+            );
+        }
+
+        await projectService.changeContributorStatus(
+            body.projectId,
+            body.teamMemberId,
+            adminId,
+            "INACTIVE"
+        );
+
+        res.status(204).send();
+    });
+
+    reactivateContributor = catchAsync(async (req, res) => {
+        const { adminId, body } = req;
+
+        if (!body.teamMemberId || !body.projectId) {
+            throw new CustomError(
+                "All fields are required: teamMemberId, projectId",
+                400
+            );
+        }
+
+        await projectService.changeContributorStatus(
+            body.projectId,
+            body.teamMemberId,
+            adminId,
+            "ACTIVE"
+        );
+
+        res.status(204).send();
+    });
 }
 
 export const projectController = new ProjectController();
