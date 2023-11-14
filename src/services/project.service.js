@@ -1,5 +1,6 @@
 import { prisma } from "../prisma/index.js";
 import { CustomError } from "../utils/custom-error.js";
+import { teamMemberService } from "./team-member.service.js";
 
 class ProjectService {
     create = async (input, adminId) => {
@@ -67,6 +68,57 @@ class ProjectService {
                 status: status
             }
         });
+    };
+
+    addContributor = async (projectId, teamMemberId, adminId) => {
+        await this.isProjectBelongsToAdmin(projectId, adminId);
+        await teamMemberService.isTeamMemberBelongsToAdmin(
+            teamMemberId,
+            adminId
+        );
+        await prisma.teamMemberProject.create({
+            data: { projectId, teamMemberId }
+        });
+    };
+
+    changeContributorStatus = async (
+        projectId,
+        teamMemberId,
+        adminId,
+        status
+    ) => {
+        await this.isProjectBelongsToAdmin(projectId, adminId);
+        await teamMemberService.isTeamMemberBelongsToAdmin(
+            teamMemberId,
+            adminId
+        );
+        await prisma.teamMemberProject.updateMany({
+            where: {
+                projectId,
+                teamMemberId
+            },
+            data: {
+                status
+            }
+        });
+    };
+
+    isProjectBelongsToAdmin = async (id, adminId) => {
+        const project = await prisma.project.findUnique({
+            where: {
+                id
+            }
+        });
+
+        if (!project) {
+            throw new CustomError("Project does not exist", 404);
+        }
+        if (project.adminId !== adminId) {
+            throw new CustomError(
+                "Forbidden: You are not authorized to perform this action",
+                404
+            );
+        }
     };
 }
 
