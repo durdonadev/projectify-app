@@ -30,4 +30,6 @@ teamMemberRouter.patch(
     teamMemberController.reactivate
 );
 
+teamMemberRouter.post("/login", teamMemberController.login);
+
 export { teamMemberRouter };

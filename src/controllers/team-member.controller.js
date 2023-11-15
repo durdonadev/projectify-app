@@ -73,7 +73,11 @@ class TeamMemberController {
 
     deactivate = catchAsync(async (req, res) => {
         const { adminId, body } = req;
-        await teamMemberService.changeStatus(adminId, body.teamMemberId);
+        await teamMemberService.changeStatus(
+            adminId,
+            body.teamMemberId,
+            "INACTIVE"
+        );
 
         res.status(204).send();
     });
@@ -87,6 +91,24 @@ class TeamMemberController {
         );
 
         res.status(204).send();
+    });
+
+    login = catchAsync(async (req, res) => {
+        const {
+            body: { email, password }
+        } = req;
+
+        if (!email || !password) {
+            throw new CustomError(
+                "All fields required: Email and Password",
+                400
+            );
+        }
+
+        const jwt = await teamMemberService.login(email, password);
+        res.status(200).json({
+            token: jwt
+        });
     });
 }
 
