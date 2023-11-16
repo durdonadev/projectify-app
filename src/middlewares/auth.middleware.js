@@ -1,22 +1,16 @@
 import jwt from "jsonwebtoken";
+import { CustomError } from "../utils/custom-error.js";
 
 class AuthMiddleware {
-    authenticate = (req, res, next) => {
+    authenticate = (req, _, next) => {
         const { headers } = req;
         if (!headers.authorization) {
-            res.status(401).json({
-                message: "You are not logged in. Please, log in"
-            });
-            return;
+            throw new CustomError("You are not logged in. Please, log in", 401);
         }
         const [prefix, token] = headers.authorization.split(" ");
 
         if (!prefix || !token) {
-            res.status(400).json({
-                message: "Not Valid Token"
-            });
-
-            return;
+            throw new CustomError("Not Valid Token", 400);
         }
 
         try {
@@ -30,10 +24,21 @@ class AuthMiddleware {
             }
             next();
         } catch (error) {
-            res.status(500).json({
-                error: error.message
-            });
+            throw new CustomError(error.message, 500);
         }
+    };
+
+    isAdmin = (req, _, next) => {
+        const { adminId } = req;
+
+        if (!adminId) {
+            throw new CustomError(
+                "Forbidden: You are not authorized to perform this action",
+                403
+            );
+        }
+
+        next();
     };
 }
 
