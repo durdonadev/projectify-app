@@ -32,6 +32,16 @@ class StoryService {
 
         return story;
     };
+
+    getAll = async (projectId) => {
+        const stories = await prisma.story.findMany({
+            where: {
+                projectId: projectId
+            }
+        });
+
+        return stories;
+    };
 }
 
 export const storyService = new StoryService();
