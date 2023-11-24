@@ -151,7 +151,7 @@ class AdminController {
         });
     });
 
-    getTask = async (req, res) => {
+    getTask = catchAsync(async (req, res) => {
         const { adminId, params } = req;
 
         const task = await adminService.getTask(adminId, params.taskId);
@@ -159,7 +159,7 @@ class AdminController {
         res.status(200).json({
             data: task
         });
-    };
+    });
 
     deleteTask = catchAsync(async (req, res) => {
         const { adminId, params } = req;

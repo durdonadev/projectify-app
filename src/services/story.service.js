@@ -12,28 +12,23 @@ class StoryService {
         return story;
     };
 
-    getOne = async (id, adminId) => {
+    getOne = async (storyId, input, adminId) => {
+        await projectService.isProjectBelongsToAdmin(input.projectId, adminId);
+
+        await this.isStoryAssignedToTeamMember(storyId, input.assigneeId);
+
         const story = await prisma.story.findUnique({
             where: {
-                id: id
+                id: storyId
             }
         });
-
-        if (!story) {
-            throw new CustomError("Story does not exist", 404);
-        }
-
-        if (story.adminId !== adminId) {
-            throw new CustomError(
-                "Forbidden: This story does not belong to you!",
-                403
-            );
-        }
 
         return story;
     };
 
-    getAll = async (projectId) => {
+    getAll = async (projectId, adminId) => {
+        await projectService.isProjectBelongsToAdmin(projectId, adminId);
+
         const stories = await prisma.story.findMany({
             where: {
                 projectId: projectId
@@ -53,6 +48,50 @@ class StoryService {
                 ...update
             }
         });
+    };
+
+    // isStoryBelongsToProject = async (storyId, projectId) => {
+    //     const story = await prisma.story.findUnique({
+    //         where: {
+    //             id: storyId
+    //         },
+    //         select: {
+    //             id: true,
+    //             projectId: true
+    //         }
+    //     });
+
+    //     if (!story) {
+    //         throw new CustomError("Story does not exist", 404);
+    //     }
+    //     if (story.projectId !== projectId) {
+    //         throw new CustomError(
+    //             "Forbidden: You are not authorized to perform this action",
+    //             404
+    //         );
+    //     }
+    // };
+
+    isStoryAssignedToTeamMember = async (storyId, assigneeId) => {
+        const story = await prisma.story.findUnique({
+            where: {
+                id: storyId
+            },
+            select: {
+                id: true,
+                assigneeId: true
+            }
+        });
+
+        if (!story) {
+            throw new CustomError("Story does not exist", 404);
+        }
+        if (story.assigneeId !== assigneeId) {
+            throw new CustomError(
+                "Forbidden: You are not authorized to perform this action",
+                404
+            );
+        }
     };
 }
 
