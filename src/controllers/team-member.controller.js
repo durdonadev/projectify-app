@@ -100,7 +100,7 @@ class TeamMemberController {
 
         if (!email || !password) {
             throw new CustomError(
-                "All fields required: Email and Password",
+                "All fields required: email and password",
                 400
             );
         }

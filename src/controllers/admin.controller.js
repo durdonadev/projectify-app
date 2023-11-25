@@ -151,24 +151,15 @@ class AdminController {
         });
     });
 
-    getTask = async (req, res) => {
+    getTask = catchAsync(async (req, res) => {
         const { adminId, params } = req;
-        try {
-            const task = await adminService.getTask(adminId, params.taskId);
 
-            res.status(200).json({
-                data: task
-            });
-        } catch (error) {
-            let status = 500;
-            if (error.message === "Task not found") {
-                status = 404;
-            }
-            res.status(status).json({
-                message: error.message
-            });
-        }
-    };
+        const task = await adminService.getTask(adminId, params.taskId);
+
+        res.status(200).json({
+            data: task
+        });
+    });
 
     deleteTask = catchAsync(async (req, res) => {
         const { adminId, params } = req;

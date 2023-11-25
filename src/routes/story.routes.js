@@ -11,4 +11,25 @@ storyRouter.post(
     storyController.create
 );
 
+storyRouter.get(
+    "/:id",
+    authMiddleware.authenticate,
+    authMiddleware.isAdmin,
+    storyController.getOne
+);
+
+storyRouter.get(
+    "/",
+    authMiddleware.authenticate,
+    authMiddleware.isAdmin,
+    storyController.getAll
+);
+
+storyRouter.patch(
+    "/:id",
+    authMiddleware.authenticate,
+    authMiddleware.isAdmin,
+    storyController.update
+);
+
 export { storyRouter };
