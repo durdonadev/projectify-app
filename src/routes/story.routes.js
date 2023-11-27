@@ -18,4 +18,18 @@ storyRouter.get(
     storyController.getOne
 );
 
+storyRouter.patch(
+    "/:id",
+    authMiddleware.authenticate,
+    authMiddleware.verifyReadUpdateDeleteStoryPermissions,
+    storyController.update
+);
+
+storyRouter.patch(
+    "/:id/archive",
+    authMiddleware.authenticate,
+    authMiddleware.isAdmin,
+    storyController.archive
+);
+
 export { storyRouter };

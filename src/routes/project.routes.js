@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { projectController } from "../controllers/project.controller.js";
+import { storyController } from "../controllers/story.controller.js";
 
 const projectRouter = Router();
 projectRouter.post(
@@ -22,6 +23,13 @@ projectRouter.patch(
     authMiddleware.authenticate,
     authMiddleware.isAdmin,
     projectController.reactivateContributor
+);
+
+projectRouter.get(
+    "/stories/:projectId",
+    authMiddleware.authenticate,
+    authMiddleware.isAdmin,
+    storyController.getAll
 );
 
 projectRouter.post(
@@ -58,6 +66,7 @@ projectRouter.patch(
     authMiddleware.isAdmin,
     projectController.archive
 );
+
 projectRouter.patch(
     "/:id/reactivate",
     authMiddleware.authenticate,
