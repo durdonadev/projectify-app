@@ -25,4 +25,11 @@ storyRouter.patch(
     storyController.update
 );
 
+storyRouter.patch(
+    "/:id/archive",
+    authMiddleware.authenticate,
+    authMiddleware.isAdmin,
+    storyController.archive
+);
+
 export { storyRouter };

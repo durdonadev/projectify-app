@@ -76,6 +76,13 @@ class StoryController {
         await storyService.update(params.id, assigneeId, update);
         res.status(204).send();
     });
+
+    archive = catchAsync(async (req, res) => {
+        const { params, adminId } = req;
+
+        await storyService.changeStatus(params.id, adminId, "ARCHIVED");
+        res.status(204).send();
+    });
 }
 
 export const storyController = new StoryController();

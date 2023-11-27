@@ -66,6 +66,7 @@ projectRouter.patch(
     authMiddleware.isAdmin,
     projectController.archive
 );
+
 projectRouter.patch(
     "/:id/reactivate",
     authMiddleware.authenticate,
