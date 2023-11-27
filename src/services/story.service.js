@@ -21,8 +21,19 @@ class StoryService {
         if (!story) {
             throw new CustomError("Story does not exist", 404);
         }
-
         return story;
+    };
+
+    getAll = async (projectId, adminId) => {
+        await projectService.isProjectBelongsToAdmin(projectId, adminId);
+
+        const stories = await prisma.story.findMany({
+            where: {
+                projectId: projectId
+            }
+        });
+
+        return stories;
     };
 }
 
