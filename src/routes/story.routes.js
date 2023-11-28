@@ -14,14 +14,14 @@ storyRouter.post(
 storyRouter.get(
     "/:id",
     authMiddleware.authenticate,
-    authMiddleware.verifyReadUpdateDeleteStoryPermissions,
+    authMiddleware.verifyReadStoryPermissions,
     storyController.getOne
 );
 
 storyRouter.patch(
     "/:id",
     authMiddleware.authenticate,
-    authMiddleware.verifyReadUpdateDeleteStoryPermissions,
+    authMiddleware.isAdmin,
     storyController.update
 );
 
