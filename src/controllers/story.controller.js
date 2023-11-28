@@ -25,7 +25,7 @@ class StoryController {
             projectId
         };
 
-        const story = await storyService.create(input, adminId);
+        const story = await storyService.create(input);
 
         res.status(200).json({
             data: story
@@ -78,9 +78,9 @@ class StoryController {
     });
 
     archive = catchAsync(async (req, res) => {
-        const { params, adminId } = req;
+        const { params } = req;
 
-        await storyService.changeStatus(params.id, adminId, "ARCHIVED");
+        await storyService.changeStatus(params.id, "ARCHIVED");
         res.status(204).send();
     });
 }
