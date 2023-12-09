@@ -80,6 +80,29 @@ class StoryController {
         await storyService.changeStatus(params.id, "ARCHIVED");
         res.status(204).send();
     });
+
+    createSubTask = catchAsync(async (req, res) => {
+        const {
+            params: { storyId },
+            body: { title, description, due }
+        } = req;
+
+        const input = {
+            title,
+            description,
+            due
+        };
+
+        if (!input.title || !input.due) {
+            throw new CustomError("Title or Due date cannot be empty", 401);
+        }
+
+        const subTask = await storyService.createSubTask(storyId, input);
+
+        res.status(200).json({
+            data: subTask
+        });
+    });
 }
 
 export const storyController = new StoryController();

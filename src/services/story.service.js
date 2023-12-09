@@ -58,6 +58,27 @@ class StoryService {
             }
         });
     };
+
+    createSubTask = async (storyId, input) => {
+        const id = uuid();
+        const subTask = {
+            ...input,
+            id: id,
+            status: "TODO"
+        };
+
+        await prisma.story.update({
+            where: {
+                id: storyId
+            },
+            data: {
+                subTasks: {
+                    push: subTask
+                }
+            }
+        });
+        return subTask;
+    };
 }
 
 export const storyService = new StoryService();
