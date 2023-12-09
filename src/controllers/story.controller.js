@@ -10,10 +10,7 @@ class StoryController {
         } = req;
 
         if (!title || !projectId) {
-            throw new CustomError(
-                "All fields are required: Title, Description and Due date!",
-                400
-            );
+            throw new CustomError("Title and Project ID are required!", 400);
         }
 
         const input = {
@@ -32,12 +29,12 @@ class StoryController {
         });
     });
 
-    getOne = (req, res) => {
+    getOne = catchAsync(async (req, res) => {
         const { story } = req;
         res.status(200).json({
             data: story
         });
-    };
+    });
 
     getAll = catchAsync(async (req, res) => {
         const { params, adminId } = req;
@@ -49,7 +46,7 @@ class StoryController {
     });
 
     update = catchAsync(async (req, res) => {
-        const { body, assigneeId, params } = req;
+        const { body, params } = req;
         const update = {};
 
         if (body.title) {
@@ -73,7 +70,7 @@ class StoryController {
             throw new CustomError("No update data provided", 400);
         }
 
-        await storyService.update(params.id, assigneeId, update);
+        await storyService.update(params.id, update);
         res.status(204).send();
     });
 
