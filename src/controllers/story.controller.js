@@ -126,6 +126,35 @@ class StoryController {
             data: subTasks
         });
     });
+
+    updateSubTask = catchAsync(async (req, res) => {
+        const {
+            story,
+            params: { subTaskId },
+            body: { title, description, due }
+        } = req;
+
+        const input = {};
+        if (title) {
+            input.title = title;
+        }
+
+        if (description) {
+            input.description = description;
+        }
+
+        if (due) {
+            input.due = due;
+        }
+
+        if (!Object.keys(input).length) {
+            throw new CustomError("No update data provided", 400);
+        }
+
+        await storyService.updateSubTask(story, subTaskId, input);
+
+        res.status(204).send();
+    });
 }
 
 export const storyController = new StoryController();

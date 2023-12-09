@@ -91,6 +91,37 @@ class StoryService {
     getAllSubTasks = async (story) => {
         return story.subTasks;
     };
+
+    updateSubTask = async (story, subTaskId, input) => {
+        const subTasksNotToUpdate = [];
+        let subTaskToUpdate = null;
+
+        story.subTasks.forEach((subTask) => {
+            if (subTask.id === subTaskId) {
+                subTaskToUpdate = subTask;
+            } else {
+                subTasksNotToUpdate.push(subTask);
+            }
+        });
+
+        if (!subTaskToUpdate) {
+            throw new CustomError("SubTask does not exist", 404);
+        }
+
+        const updatedSubTask = {
+            ...subTaskToUpdate,
+            ...input
+        };
+
+        await prisma.story.update({
+            where: {
+                id: story.id
+            },
+            data: {
+                subTasks: [...subTasksNotToUpdate, updatedSubTask]
+            }
+        });
+    };
 }
 
 export const storyService = new StoryService();
