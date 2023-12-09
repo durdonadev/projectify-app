@@ -87,6 +87,10 @@ class StoryService {
 
         return subTask;
     };
+
+    getAllSubTasks = async (story) => {
+        return story.subTasks;
+    };
 }
 
 export const storyService = new StoryService();

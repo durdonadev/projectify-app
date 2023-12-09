@@ -50,4 +50,11 @@ storyRouter.get(
     storyController.getSubTask
 );
 
+storyRouter.get(
+    "/:storyId/subTasks",
+    authMiddleware.authenticate,
+    authMiddleware.verifyReadUpdateDeleteStoryAndSubtaskPermissions,
+    storyController.getAllSubTasks
+);
+
 export { storyRouter };

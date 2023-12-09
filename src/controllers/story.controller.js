@@ -116,6 +116,16 @@ class StoryController {
             data: subTask
         });
     });
+
+    getAllSubTasks = catchAsync(async (req, res) => {
+        const { story } = req;
+
+        const subTasks = await storyService.getAllSubTasks(story);
+
+        res.status(200).json({
+            data: subTasks
+        });
+    });
 }
 
 export const storyController = new StoryController();
