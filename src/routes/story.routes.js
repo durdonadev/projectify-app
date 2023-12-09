@@ -7,6 +7,7 @@ const storyRouter = Router();
 storyRouter.post(
     "/",
     authMiddleware.authenticate,
+    authMiddleware.isAdmin,
     authMiddleware.verifyCreateStoryPermissions,
     storyController.create
 );
@@ -14,7 +15,7 @@ storyRouter.post(
 storyRouter.get(
     "/:id",
     authMiddleware.authenticate,
-    authMiddleware.verifyReadStoryPermissions,
+    authMiddleware.verifyReadUpdateDeleteStoryPermissions,
     storyController.getOne
 );
 
@@ -22,6 +23,7 @@ storyRouter.patch(
     "/:id",
     authMiddleware.authenticate,
     authMiddleware.isAdmin,
+    authMiddleware.verifyReadUpdateDeleteStoryPermissions,
     storyController.update
 );
 
@@ -29,6 +31,7 @@ storyRouter.patch(
     "/:id/archive",
     authMiddleware.authenticate,
     authMiddleware.isAdmin,
+    authMiddleware.verifyReadUpdateDeleteStoryPermissions,
     storyController.archive
 );
 

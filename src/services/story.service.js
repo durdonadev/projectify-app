@@ -3,8 +3,7 @@ import { projectService } from "./project.service.js";
 import { CustomError } from "../utils/custom-error.js";
 
 class StoryService {
-    create = async (input, adminId) => {
-        await projectService.isProjectBelongsToAdmin(input.projectId, adminId);
+    create = async (input) => {
         const story = await prisma.story.create({
             data: input
         });
@@ -48,33 +47,7 @@ class StoryService {
         });
     };
 
-    changeStatus = async (id, adminId, status) => {
-        const story = await prisma.story.findUnique({
-            where: {
-                id: id
-            }
-        });
-        if (!story) {
-            throw new CustomError("Story does not exist", 404);
-        }
-
-        const { projectId } = story;
-
-        await projectService.isProjectBelongsToAdmin(projectId, adminId);
-
-        const project = await prisma.project.findUnique({
-            where: {
-                id: projectId
-            }
-        });
-
-        if (project.adminId !== adminId) {
-            throw new CustomError(
-                "Forbidden: You are not authorized to perform this action",
-                403
-            );
-        }
-
+    changeStatus = async (id, status) => {
         await prisma.story.updateMany({
             where: {
                 id: id

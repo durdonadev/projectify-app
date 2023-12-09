@@ -44,57 +44,60 @@ class AuthMiddleware {
         next();
     };
 
-    verifyReadStoryPermissions = catchAsync(async (req, _, next) => {
-        const {
-            adminId,
-            teamMember,
-            params: { id }
-        } = req;
+    verifyReadUpdateDeleteStoryPermissions = catchAsync(
+        async (req, _, next) => {
+            const {
+                adminId,
+                teamMember,
+                params: { id }
+            } = req;
 
-        const story = await storyService.getOne(id);
-        const { projectId } = story;
+            const story = await storyService.getOne(id);
+            const { projectId } = story;
 
-        const project = await prisma.project.findUnique({
-            where: {
-                id: projectId
-            }
-        });
-
-        if (adminId) {
-            if (project.adminId !== adminId) {
-                throw new CustomError(
-                    "Forbidden: You are not authorized to perform this action",
-                    403
-                );
-            }
-            req.story = story;
-            next();
-        }
-
-        if (teamMember) {
-            const teamMemberProject = await prisma.teamMemberProject.findFirst({
+            const project = await prisma.project.findUnique({
                 where: {
-                    teamMemberId: teamMember.id,
-                    projectId: projectId
+                    id: projectId
                 }
             });
 
-            if (
-                !teamMemberProject ||
-                (teamMemberProject &&
-                    teamMemberProject.status === "INACTIVE") ||
-                project.adminId !== teamMember.adminId
-            ) {
-                throw new CustomError(
-                    "This story belongs to the project you do not have an access",
-                    403
-                );
+            if (adminId) {
+                if (project.adminId !== adminId) {
+                    throw new CustomError(
+                        "Forbidden: You are not authorized to perform this action",
+                        403
+                    );
+                }
+                req.story = story;
+                next();
             }
 
-            req.story = story;
-            next();
+            if (teamMember) {
+                const teamMemberProject =
+                    await prisma.teamMemberProject.findFirst({
+                        where: {
+                            teamMemberId: teamMember.id,
+                            projectId: projectId
+                        }
+                    });
+
+                if (
+                    !teamMemberProject ||
+                    (teamMemberProject &&
+                        teamMemberProject.status === "INACTIVE") ||
+                    project.adminId !== teamMember.adminId
+                ) {
+                    throw new CustomError(
+                        "This story belongs to the project you do not have an access",
+                        403
+                    );
+                }
+
+                req.story = story;
+                next();
+            }
         }
-    });
+    );
 
     verifyCreateStoryPermissions = catchAsync(async (req, _, next) => {
         const {
