@@ -155,6 +155,17 @@ class StoryController {
 
         res.status(204).send();
     });
+
+    deleteSubTask = catchAsync(async (req, res) => {
+        const {
+            story,
+            params: { subTaskId }
+        } = req;
+
+        await storyService.deleteSubTask(story, subTaskId);
+
+        res.status(204).send();
+    });
 }
 
 export const storyController = new StoryController();

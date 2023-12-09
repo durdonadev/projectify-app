@@ -64,4 +64,11 @@ storyRouter.patch(
     storyController.updateSubTask
 );
 
+storyRouter.delete(
+    "/:storyId/subTasks/:subTaskId",
+    authMiddleware.authenticate,
+    authMiddleware.verifyReadUpdateDeleteStoryAndSubtaskPermissions,
+    storyController.deleteSubTask
+);
+
 export { storyRouter };
