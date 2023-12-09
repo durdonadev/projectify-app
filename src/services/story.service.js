@@ -85,7 +85,65 @@ class StoryService {
             return subTask.id === subTaskId;
         });
 
+        if (!subTask) {
+            throw new CustomError("SubTask does not exist", 404);
+        }
+
         return subTask;
+    };
+
+    getAllSubTasks = async (story) => {
+        return story.subTasks;
+    };
+
+    updateSubTask = async (story, subTaskId, input) => {
+        const subTasksNotToUpdate = [];
+        let subTaskToUpdate = null;
+
+        story.subTasks.forEach((subTask) => {
+            if (subTask.id === subTaskId) {
+                subTaskToUpdate = subTask;
+            } else {
+                subTasksNotToUpdate.push(subTask);
+            }
+        });
+
+        if (!subTaskToUpdate) {
+            throw new CustomError("SubTask does not exist", 404);
+        }
+
+        const updatedSubTask = {
+            ...subTaskToUpdate,
+            ...input
+        };
+
+        await prisma.story.update({
+            where: {
+                id: story.id
+            },
+            data: {
+                subTasks: [...subTasksNotToUpdate, updatedSubTask]
+            }
+        });
+    };
+
+    deleteSubTask = async (story, subTaskId) => {
+        const subTasksToKeep = story.subTasks.filter(
+            (subTask) => subTask.id !== subTaskId
+        );
+
+        if (subTasksToKeep.length === story.subTasks.length) {
+            throw new CustomError("SubTask does not exist", 404);
+        }
+
+        await prisma.story.update({
+            where: {
+                id: story.id
+            },
+            data: {
+                subTasks: subTasksToKeep
+            }
+        });
     };
 }
 

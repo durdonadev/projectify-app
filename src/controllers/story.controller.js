@@ -116,6 +116,56 @@ class StoryController {
             data: subTask
         });
     });
+
+    getAllSubTasks = catchAsync(async (req, res) => {
+        const { story } = req;
+
+        const subTasks = await storyService.getAllSubTasks(story);
+
+        res.status(200).json({
+            data: subTasks
+        });
+    });
+
+    updateSubTask = catchAsync(async (req, res) => {
+        const {
+            story,
+            params: { subTaskId },
+            body: { title, description, due }
+        } = req;
+
+        const input = {};
+        if (title) {
+            input.title = title;
+        }
+
+        if (description) {
+            input.description = description;
+        }
+
+        if (due) {
+            input.due = due;
+        }
+
+        if (!Object.keys(input).length) {
+            throw new CustomError("No update data provided", 400);
+        }
+
+        await storyService.updateSubTask(story, subTaskId, input);
+
+        res.status(204).send();
+    });
+
+    deleteSubTask = catchAsync(async (req, res) => {
+        const {
+            story,
+            params: { subTaskId }
+        } = req;
+
+        await storyService.deleteSubTask(story, subTaskId);
+
+        res.status(204).send();
+    });
 }
 
 export const storyController = new StoryController();

@@ -50,4 +50,25 @@ storyRouter.get(
     storyController.getSubTask
 );
 
+storyRouter.get(
+    "/:storyId/subTasks",
+    authMiddleware.authenticate,
+    authMiddleware.verifyReadUpdateDeleteStoryAndSubtaskPermissions,
+    storyController.getAllSubTasks
+);
+
+storyRouter.patch(
+    "/:storyId/subTasks/:subTaskId",
+    authMiddleware.authenticate,
+    authMiddleware.verifyReadUpdateDeleteStoryAndSubtaskPermissions,
+    storyController.updateSubTask
+);
+
+storyRouter.delete(
+    "/:storyId/subTasks/:subTaskId",
+    authMiddleware.authenticate,
+    authMiddleware.verifyReadUpdateDeleteStoryAndSubtaskPermissions,
+    storyController.deleteSubTask
+);
+
 export { storyRouter };
