@@ -79,6 +79,14 @@ class StoryService {
         });
         return subTask;
     };
+
+    getSubTask = async (story, subTaskId) => {
+        const subTask = story.subTasks.find((subTask) => {
+            return subTask.id === subTaskId;
+        });
+
+        return subTask;
+    };
 }
 
 export const storyService = new StoryService();
