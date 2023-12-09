@@ -43,6 +43,14 @@ type Tasks {
     status      TaskStatus
 }
 
+type SubTasks {
+    id          String
+    title       String
+    description String?
+    due         DateTime
+    status      TaskStatus
+}
+
 model Company {
     id       String @id @default(auto()) @map("_id") @db.ObjectId
     name     String
@@ -113,4 +121,5 @@ model Story {
     point       Int?
     due         DateTime?
     assigneeId  String?     @db.ObjectId
+    subTasks    SubTasks[]
 }

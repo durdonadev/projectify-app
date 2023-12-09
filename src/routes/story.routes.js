@@ -15,7 +15,7 @@ storyRouter.post(
 storyRouter.get(
     "/:id",
     authMiddleware.authenticate,
-    authMiddleware.verifyReadUpdateDeleteStoryPermissions,
+    authMiddleware.verifyReadUpdateDeleteStoryAndSubtaskPermissions,
     storyController.getOne
 );
 
@@ -23,7 +23,7 @@ storyRouter.patch(
     "/:id",
     authMiddleware.authenticate,
     authMiddleware.isAdmin,
-    authMiddleware.verifyReadUpdateDeleteStoryPermissions,
+    authMiddleware.verifyReadUpdateDeleteStoryAndSubtaskPermissions,
     storyController.update
 );
 
@@ -31,8 +31,23 @@ storyRouter.patch(
     "/:id/archive",
     authMiddleware.authenticate,
     authMiddleware.isAdmin,
-    authMiddleware.verifyReadUpdateDeleteStoryPermissions,
+    authMiddleware.verifyReadUpdateDeleteStoryAndSubtaskPermissions,
     storyController.archive
+);
+
+storyRouter.patch(
+    "/:storyId/subTasks",
+    authMiddleware.authenticate,
+    authMiddleware.isAdmin,
+    authMiddleware.verifyReadUpdateDeleteStoryAndSubtaskPermissions,
+    storyController.createSubTask
+);
+
+storyRouter.get(
+    "/:storyId/subTasks/:subTaskId",
+    authMiddleware.authenticate,
+    authMiddleware.verifyReadUpdateDeleteStoryAndSubtaskPermissions,
+    storyController.getSubTask
 );
 
 export { storyRouter };

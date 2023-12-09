@@ -10,10 +10,7 @@ class StoryController {
         } = req;
 
         if (!title || !projectId) {
-            throw new CustomError(
-                "All fields are required: Title, Description and Due date!",
-                400
-            );
+            throw new CustomError("Title and Project ID are required!", 400);
         }
 
         const input = {
@@ -32,12 +29,12 @@ class StoryController {
         });
     });
 
-    getOne = (req, res) => {
+    getOne = catchAsync(async (req, res) => {
         const { story } = req;
         res.status(200).json({
             data: story
         });
-    };
+    });
 
     getAll = catchAsync(async (req, res) => {
         const { params, adminId } = req;
@@ -49,7 +46,7 @@ class StoryController {
     });
 
     update = catchAsync(async (req, res) => {
-        const { body, assigneeId, params } = req;
+        const { body, params } = req;
         const update = {};
 
         if (body.title) {
@@ -73,7 +70,7 @@ class StoryController {
             throw new CustomError("No update data provided", 400);
         }
 
-        await storyService.update(params.id, assigneeId, update);
+        await storyService.update(params.id, update);
         res.status(204).send();
     });
 
@@ -82,6 +79,42 @@ class StoryController {
 
         await storyService.changeStatus(params.id, "ARCHIVED");
         res.status(204).send();
+    });
+
+    createSubTask = catchAsync(async (req, res) => {
+        const {
+            params: { storyId },
+            body: { title, description, due }
+        } = req;
+
+        const input = {
+            title,
+            description,
+            due
+        };
+
+        if (!input.title || !input.due) {
+            throw new CustomError("Title or Due date cannot be empty", 401);
+        }
+
+        const subTask = await storyService.createSubTask(storyId, input);
+
+        res.status(200).json({
+            data: subTask
+        });
+    });
+
+    getSubTask = catchAsync(async (req, res) => {
+        const {
+            story,
+            params: { subTaskId }
+        } = req;
+
+        const subTask = await storyService.getSubTask(story, subTaskId);
+
+        res.status(200).json({
+            data: subTask
+        });
     });
 }
 
