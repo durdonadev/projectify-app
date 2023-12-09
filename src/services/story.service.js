@@ -59,6 +59,14 @@ class StoryService {
         });
     };
 
+    deleteOne = async (id) => {
+        await prisma.story.delete({
+            where: {
+                id: id
+            }
+        });
+    };
+
     createSubTask = async (storyId, input) => {
         const id = uuid();
         const subTask = {
