@@ -44,6 +44,47 @@ class AuthMiddleware {
         next();
     };
 
+    verifyCreateStoryPermissions = catchAsync(async (req, _, next) => {
+        const {
+            adminId,
+            body: { assigneeId, projectId }
+        } = req;
+
+        if (adminId) {
+            const project = await prisma.project.findUnique({
+                where: {
+                    id: projectId
+                }
+            });
+
+            if (project.adminId !== adminId) {
+                throw new CustomError(
+                    "Forbidden: You are not authorized to perform this action",
+                    403
+                );
+            }
+
+            const teamMemberProject = await prisma.teamMemberProject.findFirst({
+                where: {
+                    projectId: projectId
+                }
+            });
+
+            if (
+                !teamMemberProject ||
+                assigneeId !== teamMemberProject.teamMemberId ||
+                teamMemberProject.status === "INACTIVE"
+            ) {
+                throw new CustomError(
+                    "Team member you assigned to the story does not have an acsess to the Project",
+                    403
+                );
+            }
+
+            next();
+        }
+    });
+
     verifyReadUpdateDeleteStoryAndSubtaskPermissions = catchAsync(
         async (req, _, next) => {
             const {
@@ -110,47 +151,6 @@ class AuthMiddleware {
             }
         }
     );
-
-    verifyCreateStoryPermissions = catchAsync(async (req, _, next) => {
-        const {
-            adminId,
-            body: { assigneeId, projectId }
-        } = req;
-
-        if (adminId) {
-            const project = await prisma.project.findUnique({
-                where: {
-                    id: projectId
-                }
-            });
-
-            if (project.adminId !== adminId) {
-                throw new CustomError(
-                    "Forbidden: You are not authorized to perform this action",
-                    403
-                );
-            }
-
-            const teamMemberProject = await prisma.teamMemberProject.findFirst({
-                where: {
-                    projectId: projectId
-                }
-            });
-
-            if (
-                !teamMemberProject ||
-                assigneeId !== teamMemberProject.teamMemberId ||
-                teamMemberProject.status === "INACTIVE"
-            ) {
-                throw new CustomError(
-                    "Team member you assigned to the story does not have an acsess to the Project",
-                    403
-                );
-            }
-
-            next();
-        }
-    });
 }
 
 export const authMiddleware = new AuthMiddleware();
