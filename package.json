@@ -4,8 +4,8 @@
     "description": "Project Management App",
     "main": "index.js",
     "scripts": {
-        "start:dev": "NODE_ENV=local nodemon ./src/index.js",
-        "start": "node ./src/index.js",
+        "start:dev": "set NODE_ENV=local && nodemon ./src/index.js",
+        "start": "set NODE_ENV=local && node ./src/index.js",
         "prisma:g": "npx prisma generate --schema=./src/prisma/schema.prisma",
         "db:p": "npx prisma db push --schema=./src/prisma/schema.prisma"
     },
