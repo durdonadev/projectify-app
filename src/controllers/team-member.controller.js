@@ -110,6 +110,50 @@ class TeamMemberController {
             token: jwt
         });
     });
+
+    forgotPassword = catchAsync(async (req, res) => {
+        const {
+            body: { email }
+        } = req;
+
+        await teamMemberService.forgotPassword(email);
+        res.status(200).json({
+            message:
+                "We emailed you an instruction to reset your password. Follow it!"
+        });
+    });
+
+    resetPassword = catchAsync(async (req, res) => {
+        const {
+            body: { password, passwordConfirm },
+            headers
+        } = req;
+        if (!password || !passwordConfirm) {
+            throw new CustomError(
+                "Password and Password Confirm is required",
+                400
+            );
+        }
+
+        if (password !== passwordConfirm) {
+            throw new CustomError(
+                "Password and Password Confirm does not match",
+                400
+            );
+        }
+        if (!headers.authorization) {
+            throw new CustomError("Reset Token is missing", 400);
+        }
+        const [bearer, token] = headers.authorization.split(" ");
+        if (bearer !== "Bearer" || !token) {
+            throw new CustomError("Invalid Token", 400);
+        }
+
+        await teamMemberService.resetPassword(token, password);
+        res.status(200).json({
+            message: "Password successfully updated"
+        });
+    });
 }
 
 export const teamMemberController = new TeamMemberController();

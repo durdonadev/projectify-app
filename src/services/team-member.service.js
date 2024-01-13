@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { prisma } from "../prisma/index.js";
 import { crypto } from "../utils/crypto.js";
 import { mailer } from "../utils/mailer.js";
+import { date } from "../utils/date.js";
 import { CustomError } from "../utils/custom-error.js";
 import { bcrypt } from "../utils/bcrypt.js";
 
@@ -203,6 +204,87 @@ class TeamMemberService {
         );
 
         return token;
+    };
+
+    forgotPassword = async (email) => {
+        const teamMember = await prisma.teamMember.findFirst({
+            where: {
+                email
+            },
+            select: {
+                id: true
+            }
+        });
+
+        if (!teamMember) {
+            throw new CustomError(
+                "Tean Member does not exist with provided email",
+                404
+            );
+        }
+
+        const passwordResetToken = crypto.createToken();
+        const hashedPasswordResetToken = crypto.hash(passwordResetToken);
+
+        await prisma.teamMember.update({
+            where: {
+                id: teamMember.id
+            },
+            data: {
+                passwordResetToken: hashedPasswordResetToken,
+                passwordResetTokenExpirationDate: date.addMinutes(10)
+            }
+        });
+
+        await mailer.sendPasswordResetTokenTeamMember(
+            email,
+            passwordResetToken
+        );
+    };
+
+    resetPassword = async (token, password) => {
+        const hashedPasswordResetToken = crypto.hash(token);
+        const teamMember = await prisma.teamMember.findFirst({
+            where: {
+                passwordResetToken: hashedPasswordResetToken
+            },
+            select: {
+                id: true,
+                passwordResetToken: true,
+                passwordResetTokenExpirationDate: true
+            }
+        });
+
+        if (!teamMember) {
+            throw new CustomError(
+                "Team-Member does not exist with provided Password Reset Token",
+                404
+            );
+        }
+
+        const currentTime = new Date();
+        const tokenExpDate = new Date(
+            teamMember.passwordResetTokenExpirationDate
+        );
+
+        if (tokenExpDate < currentTime) {
+            // Token Expired;
+            throw new CustomError(
+                "Password Reset Token Expired: Request a new one",
+                400
+            );
+        }
+
+        await prisma.teamMember.update({
+            where: {
+                id: teamMember.id
+            },
+            data: {
+                password: await bcrypt.hash(password),
+                passwordResetToken: null,
+                passwordResetTokenExpirationDate: null
+            }
+        });
     };
 }
 

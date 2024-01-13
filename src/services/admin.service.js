@@ -15,6 +15,7 @@ class AdminService {
         const admin = await prisma.admin.create({
             data: {
                 ...adminInput,
+                email: adminInput.email.toLowerCase(),
                 password: hashedPassword,
                 activationToken: hashedActivationToken
             },
@@ -23,12 +24,15 @@ class AdminService {
             }
         });
 
-        await prisma.company.create({
-            data: {
-                ...companyInput,
-                adminId: admin.id
-            }
-        });
+        if (companyInput.name && companyInput.position) {
+            await prisma.company.create({
+                data: {
+                    ...companyInput,
+                    adminId: admin.id
+                }
+            });
+        }
+
         await mailer.sendActivationMail(adminInput.email, activationToken);
     };
 
@@ -148,7 +152,7 @@ class AdminService {
             }
         });
 
-        await mailer.sendPasswordResetToken(email, passwordResetToken);
+        await mailer.sendPasswordResetTokenAdmin(email, passwordResetToken);
     };
 
     resetPassword = async (token, password) => {

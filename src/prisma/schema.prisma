@@ -86,17 +86,19 @@ model Project {
 }
 
 model TeamMember {
-    id          String        @id @default(auto()) @map("_id") @db.ObjectId
-    firstName   String
-    lastName    String
-    position    String
-    email       String        @unique
-    password    String?
-    status      AccountStatus @default(INACTIVE)
-    adminId     String        @db.ObjectId
-    inviteToken String?
-    createdAt   DateTime      @default(now())
-    updatedAt   DateTime      @updatedAt
+    id                               String        @id @default(auto()) @map("_id") @db.ObjectId
+    firstName                        String
+    lastName                         String
+    position                         String
+    email                            String        @unique
+    password                         String?
+    status                           AccountStatus @default(INACTIVE)
+    adminId                          String        @db.ObjectId
+    inviteToken                      String?
+    passwordResetToken               String?
+    passwordResetTokenExpirationDate DateTime?
+    createdAt                        DateTime      @default(now())
+    updatedAt                        DateTime      @updatedAt
 }
 
 model TeamMemberProject {
