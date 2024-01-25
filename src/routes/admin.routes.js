@@ -1,8 +1,6 @@
 import { Router } from "express";
 import { adminController } from "../controllers/admin.controller.js";
-import { CookieMiddleware } from "../middlewares/cookie.middleware.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
-import { GlobalError } from "../middlewares/global-error.middleware.js";
 
 const adminRouter = Router();
 

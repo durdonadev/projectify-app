@@ -305,7 +305,7 @@ class TeamMemberService {
             throw new Error("Team Member does not exist anymore, 404");
         }
 
-        return teamMemberData;
+        return { ...teamMemberData, role: "teamMember" };
     };
 }
 
