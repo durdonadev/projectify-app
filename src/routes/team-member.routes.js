@@ -40,6 +40,7 @@ teamMemberRouter.patch("/reset-password", teamMemberController.resetPassword);
 teamMemberRouter.get(
     "/me",
     authMiddleware.authenticate,
+    authMiddleware.isTeamMember,
     teamMemberController.getMe
 );
 

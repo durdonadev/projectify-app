@@ -287,25 +287,27 @@ class TeamMemberService {
         });
     };
 
-    getMe = async (teamMember) => {
-        const teamMemberData = await prisma.teamMember.findUnique({
+    getMe = async (id) => {
+        const teamMember = await prisma.teamMember.findUnique({
             where: {
-                id: teamMember.id
+                id
             },
             select: {
                 firstName: true,
                 lastName: true,
-                email: true,
                 position: true,
-                id: true
+                status: true,
+                email: true,
+                id: true,
+                adminId: true
             }
         });
 
-        if (!teamMember.id) {
-            throw new Error("Team Member does not exist anymore, 404");
+        if (!teamMember) {
+            throw new CustomError("Team member does not exist", 404);
         }
 
-        return { ...teamMemberData, role: "teamMember" };
+        return { ...teamMember, role: "teamMember" };
     };
 }
 
