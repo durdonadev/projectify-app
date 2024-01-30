@@ -171,6 +171,26 @@ class TeamMemberController {
             data: me
         });
     });
+
+    createTask = catchAsync(async (req, res) => {
+        const { teamMember, body } = req;
+
+        const input = {
+            title: body.title,
+            description: body.description,
+            due: body.due
+        };
+
+        if (!input.title || !input.due) {
+            throw new CustomError("Title or Due date cannot be empty", 400);
+        }
+
+        await teamMemberService.createTask(teamMember.id, input);
+
+        res.status(201).send({
+            message: `New Task: ${input.title} has been created`
+        });
+    });
 }
 
 export const teamMemberController = new TeamMemberController();

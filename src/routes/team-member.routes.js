@@ -43,5 +43,11 @@ teamMemberRouter.get(
     authMiddleware.isTeamMember,
     teamMemberController.getMe
 );
+teamMemberRouter.patch(
+    "/me/tasks",
+    authMiddleware.authenticate,
+    authMiddleware.isTeamMember,
+    teamMemberController.createTask
+);
 
 export { teamMemberRouter };
