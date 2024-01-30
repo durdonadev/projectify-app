@@ -14,10 +14,9 @@ class ProjectController {
             throw new CustomError("Name and Description are required", 400);
         }
 
-        const project = await projectService.create(input, adminId);
-
-        res.status(201).json({
-            data: project
+        await projectService.create(input, adminId);
+        res.status(201).send({
+            message: `New Project with name ${input.name} has been created`
         });
     });
 

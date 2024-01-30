@@ -213,7 +213,7 @@ class AdminService {
         });
 
         if (!admin) {
-            throw new Error("Admin does not exist anymore, 404");
+            throw new CustomError("Admin does not exist", 404);
         }
 
         const company = await prisma.company.findFirst({
