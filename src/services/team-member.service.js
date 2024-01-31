@@ -365,6 +365,48 @@ class TeamMemberService {
 
         return tasks;
     };
+
+    updateTask = async (teamMemberId, taskId, input) => {
+        const teamMember = await prisma.teamMember.findUnique({
+            where: {
+                id: teamMemberId
+            },
+
+            select: {
+                tasks: true
+            }
+        });
+
+        const tasksNotToUpdate = [];
+        let taskToUpdate = null;
+
+        teamMember.tasks.forEach((task) => {
+            if (task.id === taskId) {
+                taskToUpdate = task;
+            } else {
+                tasksNotToUpdate.push(task);
+            }
+        });
+
+        if (!taskToUpdate) {
+            throw new CustomError("Task does not exist", 404);
+        }
+
+        const updatedTask = {
+            ...taskToUpdate,
+            ...input
+        };
+
+        await prisma.teamMember.update({
+            where: {
+                id: teamMemberId
+            },
+
+            data: {
+                tasks: [...tasksNotToUpdate, updatedTask]
+            }
+        });
+    };
 }
 
 export const teamMemberService = new TeamMemberService();

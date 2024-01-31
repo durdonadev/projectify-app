@@ -221,6 +221,28 @@ class TeamMemberController {
             data: tasks
         });
     });
+
+    updateTask = catchAsync(async (req, res) => {
+        const { teamMember, params, body } = req;
+
+        const input = {};
+        if (body.status) {
+            input.status = body.status;
+        }
+        if (body.title) {
+            input.title = body.title;
+        }
+        if (body.description) {
+            input.description = body.description;
+        }
+
+        if (!Object.keys(input).length) {
+            throw new CustomError("Update data is required, 400");
+        }
+
+        await teamMemberService.updateTask(teamMember.id, params.taskId, input);
+        res.status(204).send();
+    });
 }
 
 export const teamMemberController = new TeamMemberController();
