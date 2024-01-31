@@ -407,6 +407,36 @@ class TeamMemberService {
             }
         });
     };
+
+    deleteTask = async (teamMemberId, taskId) => {
+        const teamMember = await prisma.teamMember.findUnique({
+            where: {
+                id: teamMemberId
+            },
+
+            select: {
+                tasks: true
+            }
+        });
+
+        const tasksToKeep = teamMember.tasks.filter(
+            (task) => task.id !== taskId
+        );
+
+        if (tasksToKeep.length === teamMember.tasks.length) {
+            throw new CustomError("Task does not exist", 404);
+        }
+
+        await prisma.teamMember.update({
+            where: {
+                id: teamMemberId
+            },
+
+            data: {
+                tasks: tasksToKeep
+            }
+        });
+    };
 }
 
 export const teamMemberService = new TeamMemberService();

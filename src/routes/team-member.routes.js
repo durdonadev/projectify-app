@@ -67,5 +67,11 @@ teamMemberRouter.patch(
     authMiddleware.isTeamMember,
     teamMemberController.updateTask
 );
+teamMemberRouter.delete(
+    "/me/tasks/:taskId",
+    authMiddleware.authenticate,
+    authMiddleware.isTeamMember,
+    teamMemberController.deleteTask
+);
 
 export { teamMemberRouter };

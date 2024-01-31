@@ -243,6 +243,13 @@ class TeamMemberController {
         await teamMemberService.updateTask(teamMember.id, params.taskId, input);
         res.status(204).send();
     });
+
+    deleteTask = catchAsync(async (req, res) => {
+        const { teamMember, params } = req;
+
+        await teamMemberService.deleteTask(teamMember.id, params.taskId);
+        res.status(204).send();
+    });
 }
 
 export const teamMemberController = new TeamMemberController();
