@@ -351,6 +351,20 @@ class TeamMemberService {
 
         return task;
     };
+
+    getTasks = async (teamMemberId) => {
+        const tasks = await prisma.teamMember.findUnique({
+            where: {
+                id: teamMemberId
+            },
+
+            select: {
+                tasks: true
+            }
+        });
+
+        return tasks;
+    };
 }
 
 export const teamMemberService = new TeamMemberService();

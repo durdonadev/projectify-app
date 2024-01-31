@@ -204,6 +204,23 @@ class TeamMemberController {
             data: task
         });
     });
+
+    getTasks = catchAsync(async (req, res) => {
+        const { teamMember } = req;
+
+        if (!teamMember.id) {
+            throw new CustomError(
+                "Forbidden: You are not authorized to perform this action",
+                403
+            );
+        }
+
+        const tasks = await teamMemberService.getTasks(teamMember.id);
+
+        res.status(200).json({
+            data: tasks
+        });
+    });
 }
 
 export const teamMemberController = new TeamMemberController();
