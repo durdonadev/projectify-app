@@ -332,6 +332,25 @@ class TeamMemberService {
 
         return task;
     };
+
+    getTask = async (teamMemberId, taskId) => {
+        const teamMember = await prisma.teamMember.findUnique({
+            where: {
+                id: teamMemberId
+            },
+
+            select: {
+                tasks: true
+            }
+        });
+
+        const task = teamMember.tasks.find((task) => task.id === taskId);
+        if (!task) {
+            throw new CustomError("Task not found", 404);
+        }
+
+        return task;
+    };
 }
 
 export const teamMemberService = new TeamMemberService();
