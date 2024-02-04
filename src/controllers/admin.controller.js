@@ -187,7 +187,7 @@ class AdminController {
         }
 
         if (!Object.keys(input).length) {
-            throw new CustomError("No update data provided", 400);
+            throw new CustomError("Update data is required", 400);
         }
 
         await adminService.updateTask(adminId, params.taskId, input);

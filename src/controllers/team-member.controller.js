@@ -36,6 +36,7 @@ class TeamMemberController {
             headers,
             body: { password, passwordConfirm, email }
         } = req;
+
         if (!headers.authorization) {
             throw new CustomError("You are not logged in. Please, log in", 401);
         }

@@ -40,7 +40,7 @@ type Tasks {
     title       String
     description String?
     due         DateTime
-    status      TaskStatus
+    status      TaskStatus @default(TODO)
 }
 
 type SubTasks {
