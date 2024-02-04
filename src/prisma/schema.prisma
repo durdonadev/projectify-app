@@ -40,7 +40,7 @@ type Tasks {
     title       String
     description String?
     due         DateTime
-    status      TaskStatus
+    status      TaskStatus @default(TODO)
 }
 
 type SubTasks {
@@ -99,6 +99,7 @@ model TeamMember {
     passwordResetTokenExpirationDate DateTime?
     createdAt                        DateTime      @default(now())
     updatedAt                        DateTime      @updatedAt
+    tasks                            Tasks[]
 }
 
 model TeamMemberProject {

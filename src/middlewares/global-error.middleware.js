@@ -25,19 +25,5 @@ export class GlobalError {
             isOperational,
             success
         });
-
-        // if (err.isOperational) {
-        //     res.status(err.statusCode).json({
-        //         message: err.message,
-        //         isOperational: true,
-        //         success
-        //     });
-        // } else {
-        //     res.status(500).json({
-        //         message: err.message,
-        //         isOperational: false,
-        //         success
-        //     });
-        // }
     }
 }

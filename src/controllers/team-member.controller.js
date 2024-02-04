@@ -36,6 +36,7 @@ class TeamMemberController {
             headers,
             body: { password, passwordConfirm, email }
         } = req;
+
         if (!headers.authorization) {
             throw new CustomError("You are not logged in. Please, log in", 401);
         }
@@ -170,6 +171,85 @@ class TeamMemberController {
         res.status(200).json({
             data: me
         });
+    });
+
+    createTask = catchAsync(async (req, res) => {
+        const { teamMember, body } = req;
+
+        const input = {
+            title: body.title,
+            description: body.description,
+            due: body.due
+        };
+
+        if (!input.title || !input.due) {
+            throw new CustomError("Title or Due date cannot be empty", 400);
+        }
+
+        await teamMemberService.createTask(teamMember.id, input);
+
+        res.status(201).send({
+            message: `New Task: ${input.title} has been created`
+        });
+    });
+
+    getTask = catchAsync(async (req, res) => {
+        const { teamMember, params } = req;
+
+        const task = await teamMemberService.getTask(
+            teamMember.id,
+            params.taskId
+        );
+
+        res.status(200).json({
+            data: task
+        });
+    });
+
+    getTasks = catchAsync(async (req, res) => {
+        const { teamMember } = req;
+
+        if (!teamMember.id) {
+            throw new CustomError(
+                "Forbidden: You are not authorized to perform this action",
+                403
+            );
+        }
+
+        const tasks = await teamMemberService.getTasks(teamMember.id);
+
+        res.status(200).json({
+            data: tasks
+        });
+    });
+
+    updateTask = catchAsync(async (req, res) => {
+        const { teamMember, params, body } = req;
+
+        const input = {};
+        if (body.status) {
+            input.status = body.status;
+        }
+        if (body.title) {
+            input.title = body.title;
+        }
+        if (body.description) {
+            input.description = body.description;
+        }
+
+        if (!Object.keys(input).length) {
+            throw new CustomError("Update data is required, 400");
+        }
+
+        await teamMemberService.updateTask(teamMember.id, params.taskId, input);
+        res.status(204).send();
+    });
+
+    deleteTask = catchAsync(async (req, res) => {
+        const { teamMember, params } = req;
+
+        await teamMemberService.deleteTask(teamMember.id, params.taskId);
+        res.status(204).send();
     });
 }
 

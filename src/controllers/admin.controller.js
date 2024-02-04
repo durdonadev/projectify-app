@@ -130,10 +130,10 @@ class AdminController {
             throw new CustomError("Title or Due date cannot be empty", 400);
         }
 
-        const data = await adminService.createTask(adminId, input);
+        await adminService.createTask(adminId, input);
 
-        res.status(201).json({
-            data
+        res.status(201).send({
+            message: `New Task: ${input.title} has been created`
         });
     });
 
@@ -187,7 +187,7 @@ class AdminController {
         }
 
         if (!Object.keys(input).length) {
-            throw new CustomError("No update data provided", 400);
+            throw new CustomError("Update data is required", 400);
         }
 
         await adminService.updateTask(adminId, params.taskId, input);
