@@ -186,23 +186,10 @@ class TeamMemberController {
             throw new CustomError("Title or Due date cannot be empty", 400);
         }
 
-        await teamMemberService.createTask(teamMember.id, input);
+        const data = await teamMemberService.createTask(teamMember.id, input);
 
-        res.status(201).send({
-            message: `New Task: ${input.title} has been created`
-        });
-    });
-
-    getTask = catchAsync(async (req, res) => {
-        const { teamMember, params } = req;
-
-        const task = await teamMemberService.getTask(
-            teamMember.id,
-            params.taskId
-        );
-
-        res.status(200).json({
-            data: task
+        res.status(201).json({
+            data
         });
     });
 
@@ -220,6 +207,19 @@ class TeamMemberController {
 
         res.status(200).json({
             data: tasks
+        });
+    });
+
+    getTask = catchAsync(async (req, res) => {
+        const { teamMember, params } = req;
+
+        const task = await teamMemberService.getTask(
+            teamMember.id,
+            params.taskId
+        );
+
+        res.status(200).json({
+            data: task
         });
     });
 
