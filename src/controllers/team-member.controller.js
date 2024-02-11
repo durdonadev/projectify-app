@@ -33,6 +33,13 @@ class TeamMemberController {
         });
     });
 
+    delete = catchAsync(async (req, res) => {
+        const { adminId, body } = req;
+        await teamMemberService.delete(adminId, body.teamMemberId);
+
+        res.status(204).send();
+    });
+
     createPassword = catchAsync(async (req, res) => {
         const {
             headers,
