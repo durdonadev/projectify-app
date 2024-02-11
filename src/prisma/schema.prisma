@@ -97,6 +97,7 @@ model TeamMember {
     inviteToken                      String?
     passwordResetToken               String?
     passwordResetTokenExpirationDate DateTime?
+    joinDate                         DateTime
     createdAt                        DateTime      @default(now())
     updatedAt                        DateTime      @updatedAt
     tasks                            Tasks[]
