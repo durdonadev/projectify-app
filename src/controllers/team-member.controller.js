@@ -38,7 +38,7 @@ class TeamMemberController {
         } = req;
 
         if (!headers.authorization) {
-            throw new CustomError("You are not logged in. Please, log in", 401);
+            throw new CustomError("Invite Token is missing", 401);
         }
         const [prefix, token] = headers.authorization.split(" ");
 
@@ -47,7 +47,7 @@ class TeamMemberController {
         }
 
         if (!token) {
-            throw new CustomError("Invite Token is missing", 400);
+            throw new CustomError("Token was not sent in correct form", 400);
         }
 
         if (!password || !passwordConfirm || !email) {
@@ -235,6 +235,9 @@ class TeamMemberController {
         }
         if (body.description) {
             input.description = body.description;
+        }
+        if (body.due) {
+            input.due = body.due;
         }
 
         if (!Object.keys(input).length) {
