@@ -34,8 +34,8 @@ class TeamMemberController {
     });
 
     delete = catchAsync(async (req, res) => {
-        const { adminId, body } = req;
-        await teamMemberService.delete(adminId, body.teamMemberId);
+        const { adminId, params } = req;
+        await teamMemberService.delete(adminId, params.id);
 
         res.status(204).send();
     });
@@ -52,10 +52,6 @@ class TeamMemberController {
         const [prefix, token] = headers.authorization.split(" ");
 
         if (!prefix || !token) {
-            throw new CustomError("Not Valid Token", 400);
-        }
-
-        if (!token) {
             throw new CustomError("Token was not sent in correct form", 400);
         }
 
@@ -90,23 +86,15 @@ class TeamMemberController {
     });
 
     deactivate = catchAsync(async (req, res) => {
-        const { adminId, body } = req;
-        await teamMemberService.changeStatus(
-            adminId,
-            body.teamMemberId,
-            "INACTIVE"
-        );
+        const { adminId, params } = req;
+        await teamMemberService.changeStatus(adminId, params.id, "DEACTIVATED");
 
         res.status(204).send();
     });
 
     reactivate = catchAsync(async (req, res) => {
-        const { adminId, body } = req;
-        await teamMemberService.changeStatus(
-            adminId,
-            body.teamMemberId,
-            "ACTIVE"
-        );
+        const { adminId, params } = req;
+        await teamMemberService.changeStatus(adminId, params.id, "ACTIVE");
 
         res.status(204).send();
     });
