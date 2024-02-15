@@ -49,6 +49,14 @@ teamMemberRouter.get(
     authMiddleware.isTeamMember,
     teamMemberController.getMe
 );
+
+teamMemberRouter.patch(
+    "/me/change-password",
+    authMiddleware.authenticate,
+    authMiddleware.isTeamMember,
+    teamMemberController.changePassword
+);
+
 teamMemberRouter.patch(
     "/me/tasks",
     authMiddleware.authenticate,
