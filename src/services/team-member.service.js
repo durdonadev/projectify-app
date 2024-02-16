@@ -163,6 +163,34 @@ class TeamMemberService {
         });
     };
 
+    update = async (id, adminId, update) => {
+        const teamMember = await prisma.teamMember.findUnique({
+            where: {
+                id: id
+            }
+        });
+
+        if (!teamMember) {
+            throw new CustomError("Team Member does not exist", 404);
+        }
+
+        if (teamMember.adminId !== adminId) {
+            throw new CustomError(
+                "Forbidden: You are not authorized to perform this action",
+                403
+            );
+        }
+
+        await prisma.teamMember.update({
+            where: {
+                id: id
+            },
+            data: {
+                ...update
+            }
+        });
+    };
+
     isTeamMemberBelongsToAdmin = async (id, adminId) => {
         const teamMember = await prisma.teamMember.findUnique({
             where: {

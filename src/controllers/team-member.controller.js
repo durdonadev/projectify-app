@@ -99,6 +99,40 @@ class TeamMemberController {
         res.status(204).send();
     });
 
+    update = catchAsync(async (req, res) => {
+        const { adminId, params, body } = req;
+        const update = {};
+
+        if (body.firstName) {
+            update.firstName = body.firstName;
+        }
+        if (body.lastName) {
+            update.lastName = body.lastName;
+        }
+        if (body.email) {
+            update.email = body.email;
+        }
+        if (body.position) {
+            update.position = body.position;
+        }
+        if (body.joinDate) {
+            update.joinDate = body.joinDate;
+        }
+
+        if (
+            !update.firstName &&
+            !update.lastName &&
+            !update.email &&
+            !update.position &&
+            !update.joinDate
+        ) {
+            throw new CustomError("No update data provided", 400);
+        }
+
+        await teamMemberService.update(params.id, adminId, update);
+        res.status(204).send();
+    });
+
     login = catchAsync(async (req, res) => {
         const {
             body: { email, password }
