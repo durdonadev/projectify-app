@@ -41,12 +41,20 @@ teamMemberRouter.patch(
     teamMemberController.reactivate
 );
 
+teamMemberRouter.patch(
+    "/:id/change-password",
+    authMiddleware.authenticate,
+    authMiddleware.isAdmin,
+    teamMemberController.changePasswordByAdmin
+);
+
 teamMemberRouter.delete(
     "/:id/delete",
     authMiddleware.authenticate,
     authMiddleware.isAdmin,
     teamMemberController.delete
 );
+
 teamMemberRouter.post("/login", teamMemberController.login);
 teamMemberRouter.patch("/forgot-password", teamMemberController.forgotPassword);
 teamMemberRouter.patch("/reset-password", teamMemberController.resetPassword);
