@@ -434,14 +434,13 @@ class TeamMemberService {
     };
 
     changePasswordByAdmin = async (adminId, teamMemberId, input) => {
-        const { password, newPassword } = input;
+        const { newPassword } = input;
 
         const teamMember = await prisma.teamMember.findUnique({
             where: {
                 id: teamMemberId
             },
             select: {
-                password: true,
                 adminId: true
             }
         });
@@ -449,22 +448,12 @@ class TeamMemberService {
         if (!teamMember) {
             throw new CustomError("Team member not found", 404);
         }
-        console.log(adminId);
-        console.log(teamMember.adminId);
+
         if (teamMember.adminId !== adminId) {
             throw new CustomError(
                 "Forbidden: You are not authorized to perform this action",
                 403
             );
-        }
-
-        const passwordMatch = await bcrypt.compare(
-            password,
-            teamMember.password
-        );
-
-        if (!passwordMatch) {
-            throw new CustomError("Invalid Credentials", 400);
         }
 
         const hashedPassword = await bcrypt.hash(newPassword);
