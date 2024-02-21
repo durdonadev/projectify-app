@@ -21,7 +21,7 @@ teamMemberRouter.get(
 );
 
 teamMemberRouter.patch(
-    "/:id",
+    "/:id/update",
     authMiddleware.authenticate,
     authMiddleware.isAdmin,
     teamMemberController.update
