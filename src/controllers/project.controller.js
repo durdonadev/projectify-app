@@ -16,9 +16,16 @@ class ProjectController {
             !input.name ||
             !input.description ||
             !input.startDate ||
-            !body.endDate
+            !input.endDate
         ) {
             throw new CustomError("All FIelds are required", 400);
+        }
+
+        if (new Date(input.startDate) >= new Date(input.endDate)) {
+            throw new CustomError(
+                "Start Date cannot be greated than End Date",
+                400
+            );
         }
 
         await projectService.create(input, adminId);
@@ -76,6 +83,13 @@ class ProjectController {
         const { params, adminId } = req;
 
         await projectService.changeStatus(params.id, adminId, "ACTIVE");
+        res.status(204).send();
+    });
+
+    onhold = catchAsync(async (req, res) => {
+        const { params, adminId } = req;
+
+        await projectService.changeStatus(params.id, adminId, "ONHOLD");
         res.status(204).send();
     });
 
