@@ -61,24 +61,10 @@ projectRouter.get(
 );
 
 projectRouter.patch(
-    "/:id/archive",
+    "/:id/change-status",
     authMiddleware.authenticate,
     authMiddleware.isAdmin,
-    projectController.archive
-);
-
-projectRouter.patch(
-    "/:id/reactivate",
-    authMiddleware.authenticate,
-    authMiddleware.isAdmin,
-    projectController.reactivate
-);
-
-projectRouter.patch(
-    "/:id/onhold",
-    authMiddleware.authenticate,
-    authMiddleware.isAdmin,
-    projectController.onhold
+    projectController.changeStatus
 );
 
 export { projectRouter };

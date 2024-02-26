@@ -87,6 +87,7 @@ model Project {
     name        String
     description String
     status      ProjectStatus @default(ACTIVE)
+    progress    Int           @default(0)
     adminId     String        @db.ObjectId
     startDate   DateTime
     endDate     DateTime
