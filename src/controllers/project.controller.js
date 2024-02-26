@@ -28,9 +28,9 @@ class ProjectController {
             );
         }
 
-        await projectService.create(input, adminId);
+        const project = await projectService.create(input, adminId);
         res.status(201).send({
-            message: `New Project with name ${input.name} has been created`
+            data: project
         });
     });
 
