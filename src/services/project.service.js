@@ -1,5 +1,6 @@
 import { prisma } from "../prisma/index.js";
 import { CustomError } from "../utils/custom-error.js";
+import { objectifyArr } from "../utils/mixed.js";
 import { teamMemberService } from "./team-member.service.js";
 
 class ProjectService {
@@ -109,9 +110,15 @@ class ProjectService {
             teamMemberId,
             adminId
         );
-        await prisma.teamMemberProject.create({
-            data: { projectId, teamMemberId }
+        const data = await prisma.contributor.create({
+            data: { projectId, teamMemberId },
+            select: {
+                status: true,
+                joinedAt: true
+            }
         });
+
+        return data;
     };
 
     changeContributorStatus = async (
@@ -125,7 +132,7 @@ class ProjectService {
             teamMemberId,
             adminId
         );
-        await prisma.teamMemberProject.updateMany({
+        await prisma.contributor.updateMany({
             where: {
                 projectId,
                 teamMemberId
@@ -134,6 +141,55 @@ class ProjectService {
                 status
             }
         });
+    };
+
+    getContributors = async (projectId, adminId) => {
+        await this.isProjectBelongsToAdmin(projectId, adminId);
+        const teamMembers = await prisma.teamMember.findMany({
+            where: {
+                adminId
+            },
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                position: true
+            }
+        });
+
+        const contributors = await prisma.contributor.findMany({
+            where: {
+                teamMemberId: {
+                    in: teamMembers.map((teamMember) => teamMember.id)
+                },
+                projectId: projectId
+            },
+
+            select: {
+                teamMemberId: true,
+                status: true
+            }
+        });
+
+        const teamMembersObj = objectifyArr(teamMembers, "id");
+
+        const contributorsWithDetails = contributors.map((contributor) => {
+            return {
+                ...teamMembersObj[contributor.teamMemberId],
+                status: contributor.status
+            };
+        });
+
+        const contributorsObj = objectifyArr(contributors, "teamMemberId");
+
+        const notAssignedContributors = teamMembers.filter(
+            (teamMember) => !contributorsObj[teamMember.id]
+        );
+
+        return {
+            assignedContributors: contributorsWithDetails,
+            notAssignedContributors: notAssignedContributors
+        };
     };
 
     isProjectBelongsToAdmin = async (id, adminId) => {

@@ -26,6 +26,13 @@ projectRouter.patch(
 );
 
 projectRouter.get(
+    "/:id/contributors",
+    authMiddleware.authenticate,
+    authMiddleware.isAdmin,
+    projectController.getContributors
+);
+
+projectRouter.get(
     "/stories/:projectId",
     authMiddleware.authenticate,
     authMiddleware.isAdmin,
