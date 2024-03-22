@@ -120,27 +120,14 @@ class ProjectController {
         });
     });
 
-    deactivateContributor = catchAsync(async (req, res) => {
-        const { adminId, params } = req;
+    changeContributorStatus = catchAsync(async (req, res) => {
+        const { adminId, params, body } = req;
 
         await projectService.changeContributorStatus(
             params.id,
-            params.contributorId,
+            params.teamMemberId,
             adminId,
-            "INACTIVE"
-        );
-
-        res.status(204).send();
-    });
-
-    reactivateContributor = catchAsync(async (req, res) => {
-        const { adminId, params } = req;
-
-        await projectService.changeContributorStatus(
-            params.projectId,
-            params.contributorId,
-            adminId,
-            "ACTIVE"
+            body.status
         );
 
         res.status(204).send();
