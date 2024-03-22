@@ -5,21 +5,21 @@ import { storyController } from "../controllers/story.controller.js";
 
 const projectRouter = Router();
 projectRouter.post(
-    "/contributors/add",
+    "/:id/contributors/add",
     authMiddleware.authenticate,
     authMiddleware.isAdmin,
     projectController.addContributor
 );
 
 projectRouter.patch(
-    "/contributors/deactivate",
+    "/:id/contributors/:contributorId/deactivate",
     authMiddleware.authenticate,
     authMiddleware.isAdmin,
     projectController.deactivateContributor
 );
 
 projectRouter.patch(
-    "/contributors/reactivate",
+    "/:id/contributors/:contributorId/reactivate",
     authMiddleware.authenticate,
     authMiddleware.isAdmin,
     projectController.reactivateContributor
