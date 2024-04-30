@@ -13,6 +13,13 @@ storyRouter.post(
 );
 
 storyRouter.get(
+    "/project/:projectId",
+    authMiddleware.authenticate,
+    authMiddleware.isAdmin,
+    storyController.getAll
+);
+
+storyRouter.get(
     "/:id",
     authMiddleware.authenticate,
     authMiddleware.verifyReadUpdateDeleteStoryAndSubtaskPermissions,

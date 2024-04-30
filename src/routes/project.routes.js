@@ -25,13 +25,6 @@ projectRouter.get(
     projectController.getContributors
 );
 
-projectRouter.get(
-    "/stories/:projectId",
-    authMiddleware.authenticate,
-    authMiddleware.isAdmin,
-    storyController.getAll
-);
-
 projectRouter.post(
     "/",
     authMiddleware.authenticate,
