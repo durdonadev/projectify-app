@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { NextFunction, Request } from 'express';
-import { CustomError } from '../utils/';
+import { CustomError } from '../utils';
 import { RequestUser, Roles } from '../types';
 
 class AuthMiddleware {
