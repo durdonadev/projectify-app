@@ -1,11 +1,14 @@
-export interface RequestUser {
-    id: string;
-    role: Roles;
-    belongsTo?: string;
+export enum Roles {
+    TEAM_MEMBER = 'teamMember',
+    ADMIN = 'admin',
 }
 
-export interface Locals {
-    user: RequestUser;
+type AdminId = string;
+
+export interface RequestUser {
+    userId: string;
+    role: Roles;
+    belongsTo?: AdminId;
 }
 
 export interface EmptyParams {}
@@ -21,9 +24,4 @@ export interface ErrorResponse {
     message: string;
     isOperational: boolean;
     details?: object;
-}
-
-export enum Roles {
-    TEAM_MEMBER = 'teamMember',
-    ADMIN = 'admin',
 }
