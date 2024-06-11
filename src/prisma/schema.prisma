@@ -31,13 +31,6 @@ enum TaskStatus {
     DONE
 }
 
-enum StoryStatus {
-    TODO
-    INPROGRESS
-    DONE
-    ARCHIVED
-}
-
 enum ContributorStatus {
     ACTIVE
     INACTIVE
@@ -123,17 +116,26 @@ model Contributor {
     updatedAt    DateTime          @updatedAt
 }
 
-model Story {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
-    projectId String   @db.ObjectId
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+enum StoryStatus {
+    TODO
+    INPROGRESS
+    BLOCKED
+    DONE
+}
 
+type StorySubTask {
+    id   String
+    task String
+    done Boolean
+}
+
+model Story {
+    id          String         @id @default(auto()) @map("_id") @db.ObjectId
+    projectId   String         @db.ObjectId
+    assignorId  String         @db.ObjectId
+    assigneeId  String         @db.ObjectId
     title       String
-    description String?
-    status      StoryStatus @default(TODO)
-    point       Int?
-    due         DateTime?
-    assigneeId  String?     @db.ObjectId
-    subTasks    SubTasks[]
+    description String
+    status      StoryStatus
+    subTasks    StorySubTask[]
 }
