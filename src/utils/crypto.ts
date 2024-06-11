@@ -2,17 +2,16 @@ import cryptojs from "crypto-js";
 
 class Crypto {
     generateRandomString = () => {
-        const chars = "abcdefghijklmnopqrstuvwxyz";
+        const chars = "abcdefghijklmnopqrstuvwxyz1234567890";
         let randomString = "";
 
         for (let i = 0; i < 10; i++) {
-            const randomIdx = Math.floor(Math.random() * 26);
+            const randomIdx = Math.floor(Math.random() * 36);
             randomString += chars[randomIdx];
         }
         return new Date().toISOString() + randomString;
     };
-
-    hash = (input) => {
+    hash = (input: string) => {
         const hash = cryptojs.SHA256(input);
         const hashString = hash.toString(cryptojs.enc.Hex);
         return hashString;
@@ -24,7 +23,7 @@ class Crypto {
         return hashedString;
     };
 
-    compare(token, hashedToken) {
+    compare(token: string, hashedToken: string) {
         return hashedToken === this.hash(token);
     }
 }
