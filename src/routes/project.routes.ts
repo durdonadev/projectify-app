@@ -1,63 +1,61 @@
-import { Router } from "express";
-import { authMiddleware } from "../middlewares/auth.middleware.js";
-import { projectController } from "../controllers/project.controller.js";
-import { storyController } from "../controllers/story.controller.js";
+import { Router } from 'express';
+import { authMiddleware } from '../middlewares';
+import { projectController } from '../controllers';
 
 const projectRouter = Router();
 projectRouter.post(
-    "/:id/contributors/add",
+    '/:id/contributors/add',
     authMiddleware.authenticate,
     authMiddleware.isAdmin,
-    projectController.addContributor
+    projectController.addContributor,
 );
 
 projectRouter.patch(
-    "/:id/contributors/:teamMemberId/change-status",
+    '/:id/contributors/:teamMemberId/change-status',
     authMiddleware.authenticate,
     authMiddleware.isAdmin,
-    projectController.changeContributorStatus
+    projectController.changeContributorStatus,
 );
 
 projectRouter.get(
-    "/:id/contributors",
+    '/:id/contributors',
     authMiddleware.authenticate,
     authMiddleware.isAdmin,
-    projectController.getContributors
+    projectController.getContributors,
 );
 
 projectRouter.post(
-    "/",
+    '/',
     authMiddleware.authenticate,
     authMiddleware.isAdmin,
-    projectController.create
+    projectController.create,
 );
 
 projectRouter.get(
-    "/:id",
+    '/:id',
     authMiddleware.authenticate,
     authMiddleware.isAdmin,
-    projectController.getOne
+    projectController.getOne,
 );
 
 projectRouter.patch(
-    "/:id/update",
+    '/:id',
     authMiddleware.authenticate,
     authMiddleware.isAdmin,
-    projectController.update
+    projectController.update,
 );
-
 projectRouter.get(
-    "/",
+    '/',
     authMiddleware.authenticate,
     authMiddleware.isAdmin,
-    projectController.getAll
+    projectController.getAll,
 );
 
 projectRouter.patch(
-    "/:id/change-status",
+    '/:id/change-status',
     authMiddleware.authenticate,
     authMiddleware.isAdmin,
-    projectController.changeStatus
+    projectController.changeStatus,
 );
 
 export { projectRouter };
