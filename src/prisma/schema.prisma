@@ -7,7 +7,7 @@ generator client {
     provider = "prisma-client-js"
 }
 
-enum AccountStatus {
+enum AdminAccountStatus {
     ACTIVE
     INACTIVE
 }
@@ -44,35 +44,31 @@ type Tasks {
     status      TaskStatus @default(TODO)
 }
 
-type SubTasks {
-    id          String
-    title       String
-    description String?
-    due         DateTime
-    status      TaskStatus
-}
-
-model Company {
-    id       String @id @default(auto()) @map("_id") @db.ObjectId
+type Company {
     name     String
     position String
-    adminId  String @unique @db.ObjectId
+}
+
+enum AdminRole {
+    admin
 }
 
 model Admin {
-    id                               String        @id @default(auto()) @map("_id") @db.ObjectId
-    email                            String        @unique
+    id                               String             @id @default(auto()) @map("_id") @db.ObjectId
+    email                            String             @unique
     preferredFirstName               String?
     firstName                        String
     lastName                         String
     password                         String
-    status                           AccountStatus @default(INACTIVE)
+    status                           AdminAccountStatus @default(INACTIVE)
     activationToken                  String?
     passwordResetToken               String?
     passwordResetTokenExpirationDate DateTime?
-    createdAt                        DateTime      @default(now())
-    updatedAt                        DateTime      @updatedAt
+    createdAt                        DateTime           @default(now())
+    updatedAt                        DateTime           @updatedAt
     tasks                            Tasks[]
+    company                          Company?
+    role                             AdminRole          @default(admin)
 }
 
 model Project {
@@ -88,22 +84,24 @@ model Project {
     updatedAt   DateTime      @updatedAt
 }
 
+enum TeamMemberRole {
+    teamMember
+}
+
 model TeamMember {
-    id                               String                  @id @default(auto()) @map("_id") @db.ObjectId
-    firstName                        String
-    lastName                         String
-    position                         String
-    email                            String                  @unique
-    password                         String?
-    status                           TeamMemberAccountStatus @default(INACTIVE)
-    adminId                          String                  @db.ObjectId
-    inviteToken                      String?
-    passwordResetToken               String?
-    passwordResetTokenExpirationDate DateTime?
-    joinDate                         DateTime
-    createdAt                        DateTime                @default(now())
-    updatedAt                        DateTime                @updatedAt
-    tasks                            Tasks[]
+    id          String                  @id @default(auto()) @map("_id") @db.ObjectId
+    firstName   String
+    lastName    String
+    position    String
+    email       String                  @unique
+    password    String?
+    status      TeamMemberAccountStatus @default(INACTIVE)
+    adminId     String                  @db.ObjectId
+    inviteToken String?
+    joinDate    DateTime
+    createdAt   DateTime                @default(now())
+    updatedAt   DateTime                @updatedAt
+    role        TeamMemberRole          @default(teamMember)
 }
 
 model Contributor {
