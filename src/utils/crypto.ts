@@ -1,9 +1,9 @@
-import cryptojs from "crypto-js";
+import cryptojs from 'crypto-js';
 
 class Crypto {
     generateRandomString = () => {
-        const chars = "abcdefghijklmnopqrstuvwxyz1234567890";
-        let randomString = "";
+        const chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
+        let randomString = '';
 
         for (let i = 0; i < 10; i++) {
             const randomIdx = Math.floor(Math.random() * 36);

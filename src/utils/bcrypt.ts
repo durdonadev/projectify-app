@@ -1,4 +1,4 @@
-import bcryptjs from "bcryptjs";
+import bcryptjs from 'bcryptjs';
 
 class Bcrypt {
     hash = async (password: string) => {
