@@ -1,6 +1,5 @@
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library.js';
-import { NextFunction, Response } from 'express';
-
+import { NextFunction, Request, Response } from 'express';
 import { CustomError } from '../utils';
 
 export class GlobalError {
@@ -8,13 +7,14 @@ export class GlobalError {
         err: CustomError | PrismaClientKnownRequestError,
         req: Request,
         res: Response,
+        next: NextFunction,
     ) {
         const success = false;
         let statusCode = 500;
         let message = err.message;
         let isOperational = false;
 
-        if (err instanceof CustomError && err.isOperational) {
+        if (err instanceof CustomError) {
             statusCode = err.statusCode;
             isOperational = true;
         }
@@ -25,6 +25,10 @@ export class GlobalError {
                 message = 'Resource already exists';
                 isOperational = true;
             }
+        }
+
+        if (!isOperational) {
+            next();
         }
 
         res.status(statusCode).json({

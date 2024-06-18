@@ -1,10 +1,10 @@
 import jwt from 'jsonwebtoken';
-import { NextFunction, Request } from 'express';
-import { CustomError } from '../utils';
+import { NextFunction, Request, Response } from 'express';
+import { CustomError } from '../utils/';
 import { RequestUser, Roles } from '../types';
 
 class AuthMiddleware {
-    authenticate = (req: Request, _, next: NextFunction) => {
+    authenticate = (req: Request, _: Response, next: NextFunction) => {
         const { headers } = req;
         if (!headers.authorization) {
             throw new CustomError('You are not logged in. Please, log in', 401);
@@ -21,17 +21,20 @@ class AuthMiddleware {
                 process.env.JWT_SECRET as jwt.Secret,
             ) as RequestUser;
 
-            req.locals.user = payload;
+            req.locals = {
+                user: payload,
+            };
             next();
         } catch (error) {
-            throw new CustomError(error.message, 500);
+            const err = error as Error;
+            throw new CustomError(err.message, 500);
         }
     };
 
-    isAdmin = (req: Request, _, next: NextFunction) => {
+    isAdmin = (req: Request, _: Response, next: NextFunction) => {
         const { locals } = req;
 
-        if (locals.user.role !== Roles.ADMIN) {
+        if (locals && locals.user && locals.user.role !== Roles.ADMIN) {
             throw new CustomError(
                 'Forbidden: You are not authorized to perform this action',
                 403,
@@ -41,10 +44,10 @@ class AuthMiddleware {
         next();
     };
 
-    isTeamMember = (req: Request, _, next: NextFunction) => {
+    isTeamMember = (req: Request, _: Response, next: NextFunction) => {
         const { locals } = req;
 
-        if (locals.user.role !== Roles.TEAM_MEMBER) {
+        if (locals && locals.user && locals.user.role !== Roles.TEAM_MEMBER) {
             throw new CustomError(
                 'Forbidden: You are not authorized to perform this action',
                 403,
