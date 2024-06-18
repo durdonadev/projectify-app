@@ -24,7 +24,7 @@ class StoryService {
         return story;
     };
 
-    getAll = async (projectId, adminId) => {
+    async getAll(projectId, adminId) {
         await projectService.isProjectBelongsToAdmin(projectId, adminId);
 
         const stories = await prisma.story.findMany({
@@ -34,7 +34,7 @@ class StoryService {
         });
 
         return stories;
-    };
+    }
 
     update = async (id, update) => {
         await prisma.story.update({

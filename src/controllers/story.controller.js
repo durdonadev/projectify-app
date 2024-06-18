@@ -1,16 +1,16 @@
-import { catchAsync } from "../utils/catch-async.js";
-import { CustomError } from "../utils/custom-error.js";
-import { storyService } from "../services/story.service.js";
+import { catchAsync } from '../utils/catch-async.js';
+import { CustomError } from '../utils/custom-error.js';
+import { storyService } from '../services/story.service.js';
 
 class StoryController {
     create = catchAsync(async (req, res) => {
         const {
             body: { title, description, point, due, assigneeId, projectId },
-            adminId
+            adminId,
         } = req;
 
         if (!title || !projectId) {
-            throw new CustomError("Title and Project ID are required!", 400);
+            throw new CustomError('Title and Project ID are required!', 400);
         }
 
         const input = {
@@ -19,12 +19,12 @@ class StoryController {
             point,
             due,
             assigneeId,
-            projectId
+            projectId,
         };
 
         const story = await storyService.create(input, adminId);
         res.status(200).json({
-            data: story
+            data: story,
         });
     });
 
@@ -34,7 +34,7 @@ class StoryController {
         const story = await storyService.getOne(params.storyId);
 
         res.status(200).json({
-            data: story
+            data: story,
         });
     });
 
@@ -43,7 +43,7 @@ class StoryController {
 
         const stories = await storyService.getAll(params.projectId, adminId);
         res.status(200).json({
-            data: stories
+            data: stories,
         });
     });
 
@@ -69,7 +69,7 @@ class StoryController {
             !update.point &&
             !update.due
         ) {
-            throw new CustomError("No update data provided", 400);
+            throw new CustomError('No update data provided', 400);
         }
 
         await storyService.update(params.id, update);
@@ -79,7 +79,7 @@ class StoryController {
     archive = catchAsync(async (req, res) => {
         const { params } = req;
 
-        await storyService.changeStatus(params.id, "ARCHIVED");
+        await storyService.changeStatus(params.id, 'ARCHIVED');
         res.status(204).send();
     });
 
@@ -94,36 +94,36 @@ class StoryController {
     createSubTask = catchAsync(async (req, res) => {
         const {
             params: { storyId },
-            body: { title, description, due }
+            body: { title, description, due },
         } = req;
 
         const input = {
             title,
             description,
-            due
+            due,
         };
 
         if (!input.title || !input.due) {
-            throw new CustomError("Title or Due date cannot be empty", 401);
+            throw new CustomError('Title or Due date cannot be empty', 401);
         }
 
         const subTask = await storyService.createSubTask(storyId, input);
 
         res.status(200).json({
-            data: subTask
+            data: subTask,
         });
     });
 
     getSubTask = catchAsync(async (req, res) => {
         const {
             story,
-            params: { subTaskId }
+            params: { subTaskId },
         } = req;
 
         const subTask = await storyService.getSubTask(story, subTaskId);
 
         res.status(200).json({
-            data: subTask
+            data: subTask,
         });
     });
 
@@ -133,7 +133,7 @@ class StoryController {
         const subTasks = await storyService.getAllSubTasks(story);
 
         res.status(200).json({
-            data: subTasks
+            data: subTasks,
         });
     });
 
@@ -141,7 +141,7 @@ class StoryController {
         const {
             story,
             params: { subTaskId },
-            body: { title, description, due }
+            body: { title, description, due },
         } = req;
 
         const input = {};
@@ -158,7 +158,7 @@ class StoryController {
         }
 
         if (!Object.keys(input).length) {
-            throw new CustomError("No update data provided", 400);
+            throw new CustomError('No update data provided', 400);
         }
 
         await storyService.updateSubTask(story, subTaskId, input);
@@ -169,7 +169,7 @@ class StoryController {
     deleteSubTask = catchAsync(async (req, res) => {
         const {
             story,
-            params: { subTaskId }
+            params: { subTaskId },
         } = req;
 
         await storyService.deleteSubTask(story, subTaskId);
